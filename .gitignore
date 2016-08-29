@@ -4,7 +4,7 @@
 # Folders
 node_modules
 logs
-music
+files
 
 # JSON Files
 auth.json
