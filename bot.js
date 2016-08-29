@@ -5,11 +5,11 @@ var ytdl = require('ytdl-core');
 var fs = require('fs');
 
 var bot = new Discord.Client();
-var ytAPIKey = auth.youtube_api_key;
-var discordToken = auth.discord_token; 
 
 // contains tokens and API Keys
 var auth = require('./auth.json');
+var ytAPIKey = auth.youtube_api_key;
+var discordToken = auth.discord_token;
 
 // unused
 function sleep(miliseconds) {
@@ -29,8 +29,27 @@ function arrayIndexOf(myArray, searchTerm) {
     return -1;
 }
 
+// used for timestamp in console / log
+function getTimestamp() {
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    var day = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+
+    return day + ":" + hour + ":" + min + ":" + sec;
+}
+
 // command prefix
-var prefix = 'botaloo ';
+const prefix = 'botaloo ';
 
 var flags = {
     'd': {
@@ -125,14 +144,16 @@ var commands = {
         }
     },
 
-    'joinvoice': {
+    'join': {
         description: 'joins your voice channel',
         process: function (msg, arg) {
-            bot.joinVoiceChannel(msg.author.voiceChannel);
+            bot.joinVoiceChannel(msg.author.voiceChannel, function (error, connection) {
+                if (error) bot.sendMessage(msg.channel, 'Error joining voice channel :cry:');
+            });
         }
     },
 
-    'leavevoice': {
+    'leave': {
         description: 'leaves current voice channel',
         process: function (msg, arg) {
             var connection = bot.voiceConnections.get('server', msg.server);
@@ -146,28 +167,30 @@ var commands = {
             var response = '';
             var connections = bot.voiceConnections;
 
+            if (!connections) bot.sendMessage(msg.channel, 'No connections!');
+
             for (var i = 0; i < connections.length; i++) {
-                response += '' + connections[i].server.name;
+                response += '' + connections[i].server.name + ' - ' + connections[i].voiceChannel.name;
             }
             bot.sendMessage(msg.channel, response);
         }
     },
 
-    'add': {
+    'dl': {
         usage: '<video title>',
         description: 'add a youtube video to playlist',
         process: function (msg, arg) {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
-            request(searchURL, function (e, response) {
+            request(searchURL, function (error, response) {
                 var payload = JSON.parse(response.body);
                 if (payload['items'].length == 0) {
-                    bot.sendMessage(msg.channel, 'Didn\'t find anything :cry:!');
+                    bot.sendMessage(msg.channel, 'Didn\'t find anything :cry:');
                     return;
                 }
 
                 var videos = payload.items.filter(item => item.id.kind === 'youtube#video');
                 if (videos.length === 0) {
-                    bot.sendMessage(msg.channel, 'Didn\'t find any video :cry:!');
+                    bot.sendMessage(msg.channel, 'Didn\'t find any video :cry:');
                     return;
                 }
 
@@ -179,11 +202,67 @@ var commands = {
         }
     },
 
-    'play': { // need to rewrite this - use connection.playRawStream() and stop saving files
-        description: 'play a file through voice connection',
+    'play': {
+        description: 'play a video',
+        usage: '<url>',
         process: function (msg, arg) {
             var connection = bot.voiceConnections.get('server', msg.server);
-            connection.playFile('./music/' + arg, { volume: 2 });
+            if (!connection) {
+                bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+                return;
+            }
+
+            connection.playRawStream(request(arg), function (intent) {
+                if (connection.playing) bot.sendMessage(msg.channel, 'Now playing :ok_hand:');
+                intent.on('end', function () {
+                    bot.sendMessage(msg.channel, 'Finished playing :ok_hand:');
+                });
+
+                intent.on('error', function () {
+                    bot.sendMessage(msg.channel, 'Error during playback :cry:');
+                })
+
+                intent.on('time', function (time) {
+                    bot.sendMessage(msg.channel, '20ms checkpoint - ' + time + 'ms total');
+                })
+            });
+        }
+    },
+
+    'pause': {
+        description: 'pause playing audio',
+        process: function (msg, arg) {
+            var connection = bot.voiceConnections.get('server', msg.server);
+            if (!connection) {
+                bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+                return;
+            }
+            connection.pause();
+
+        }
+    },
+
+    'resume': {
+        description: 'resume playing audio',
+        process: function (msg, arg) {
+            var connection = bot.voiceConnections.get('server', msg.server);
+            if (!connection) {
+                bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+                return;
+            }
+            connection.resume();
+        }
+    },
+
+    'stop': {
+        description: 'stop playing audio',
+        process: function (msg, arg) {
+            var connection = bot.voiceConnections.get('server', msg.server);
+            if (!connection) {
+                bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+                return;
+            }
+            connection.stopPlaying();
         }
     },
 
@@ -203,18 +282,14 @@ var commands = {
 
 // message event handler
 bot.on('message', function (message) {
-    if (message.content.substring(0, prefix.length).toLowerCase() === prefix) {
+    var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();
+    if (msgPrefix === prefix.replace(/\s/g, '').toLowerCase()) {
         var flagBools = [];
-        for (flag in flags) {
-            flagBools.push(false);
-        }
+        for (flag in flags) flagBools.push(false);
         var cmd = message.content.substring(prefix.length);
-        console.log('treating ' + cmd + ' from ' + message.author + ' as command');
+        console.log('[' + getTimestamp() + '] ' + cmd + ' from @' + message.author.username);
 
-        if (cmd === '') {
-            bot.sendMessage(message.channel, 'That\'s me!');
-            commands[0].process(message);
-        }
+        if (cmd === '') bot.sendMessage(message.channel, 'That\'s me!');
 
         // check flags
         for (var flag in flags) {
