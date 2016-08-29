@@ -8,4 +8,6 @@ node_modules
 logs
 *.log
 music
+
 auth.json
+muted.json

@@ -11,6 +11,16 @@ var auth = require('./auth.json');
 var ytAPIKey = auth.youtube_api_key;
 var discordToken = auth.discord_token;
 
+try {
+    mutedusers = require("./muted.json");
+} catch (e) {
+    mutedusers = {};
+}
+
+function updateMuted() {
+    fs.writeFile("./muted.json", JSON.stringify(mutedusers, null, 2), null);
+}
+
 // unused
 function sleep(miliseconds) {
     var currentTime = new Date().getTime();
@@ -79,6 +89,21 @@ var commands = {
             }
             response += '```';
             bot.sendMessage(msg.channel, response);
+        }
+    },
+
+    'version': {
+        description: 'return the git commit this bot is running',
+        process: function (msg, arg) {
+            var commit = require('child_process').spawn('git', ['log', '-n', '1']);
+
+            commit.stdout.on('data', function (data) {
+                bot.sendMessage(msg.channel, data);
+            });
+
+            commit.on('close', function (code) {
+                if (code != 0) bot.sendMessage(msg.channel, 'Failed checking git version :cry:');
+            });
         }
     },
 
@@ -266,6 +291,27 @@ var commands = {
         }
     },
 
+    'mute': {
+        description: 'mute a user',
+        usage: '<username>',
+        process: function (msg, arg) {
+            var user = msg.channel.server.members.get('username', arg);
+
+            if (!user) bot.sendMessage(msg.channel, 'User not found :cry:');
+            if (mutedusers.hasOwnProperty(user.id)) {
+                if (msg.author.id != user.id) delete mutedusers[user.id];
+                bot.sendMessage(msg.channel, 'Unmuted ' + user.username + ' :ok_hand:');
+            } else {
+                mutedusers[user.id] = {
+                    id: user.id,
+                    username: user.username
+                };
+                updateMuted();
+                bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
+            }
+        }
+    },
+
     'listmusic': {
         description: 'lists all music available',
         process: function (msg, arg) {
@@ -278,10 +324,24 @@ var commands = {
             bot.sendMessage(msg.channel, response);
         }
     },
+
+    'eval': {		
+		description: 'executes arbitrary javascript',
+        usage: '<command>',
+		process: function(msg, arg) {
+            if (msg.author.hasRole(msg.server.roles.get('name', 'Staff'))) eval(arg);
+        }
+    },
 }
 
 // message event handler
 bot.on('message', function (message) {
+    if (mutedusers.hasOwnProperty(message.author.id)) {
+        message.delete(function (error) {
+            bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
+        });
+    }
+
     var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();
     if (msgPrefix === prefix.replace(/\s/g, '').toLowerCase()) {
         var flagBools = [];
