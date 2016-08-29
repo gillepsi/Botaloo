@@ -1,5 +1,5 @@
 # Botaloo
-A chat bot for discord based off <a href="https://github.com/hydrabolt/discord.js/">discord.js</a>
+A chat bot for discord based off [discord.js] (https://github.com/hydrabolt/discord.js/)
 
 # How to use
 1. `git clone https://github.com/slypher/botaloo.git`
@@ -10,3 +10,5 @@ A chat bot for discord based off <a href="https://github.com/hydrabolt/discord.j
   }
 3. `npm install`
 4. `node bot.js`
+
+[install nodejs] (http://nodejs.org/)

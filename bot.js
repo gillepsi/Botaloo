@@ -4,12 +4,12 @@ var request = require('request');
 var ytdl = require('ytdl-core');
 var fs = require('fs');
 
-// contains tokens and API Keys
-var auth = require('./auth.json');
-
 var bot = new Discord.Client();
 var ytAPIKey = auth.youtube_api_key;
 var discordToken = auth.discord_token; 
+
+// contains tokens and API Keys
+var auth = require('./auth.json');
 
 // unused
 function sleep(miliseconds) {
@@ -60,13 +60,6 @@ var commands = {
             }
             response += '```';
             bot.sendMessage(msg.channel, response);
-        }
-    },
-
-    'editme': {
-        description: 'not working',
-        process: function (msg, arg) {
-            bot.updateMessage(msg, 'done!');
         }
     },
 
@@ -186,8 +179,8 @@ var commands = {
         }
     },
 
-    'play': {
-        description: 'start the playlist',
+    'play': { // need to rewrite this - use connection.playRawStream() and stop saving files
+        description: 'play a file through voice connection',
         process: function (msg, arg) {
             var connection = bot.voiceConnections.get('server', msg.server);
             connection.playFile('./music/' + arg, { volume: 2 });
@@ -204,17 +197,6 @@ var commands = {
                 response += '\n' + file;
             });
             bot.sendMessage(msg.channel, response);
-        }
-    },
-
-    'modpuffin': {
-        description: 'hehexd',
-        process: function (msg, arg) {
-            var slypher = msg.channel.server.members.getAll('username', 'Slypher');
-            var puffin = msg.channel.server.members.getAll('username', 'PuffinMuffins');
-            if (!puffin[0]) console.log('\n\n\n\problem!');
-            console.log();
-            bot.addMemberToRole(puffin, msg.server.rolesOfUser(slypher[0])[0]);
         }
     },
 }
