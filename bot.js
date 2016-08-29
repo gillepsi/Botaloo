@@ -9,20 +9,29 @@ exports.getBot = function () {
     return bot;
 }
 
+const logDir = './logs/';
+const fileDir = './files/';
+const serverDir = './servers/';
+const pluginDir = './plugins/';
+
+exports.logDir = logDir;
+exports.fileDir = fileDir;
+exports.serverDir = serverDir;
+exports.pluginDir = pluginDir;
+
 // contains tokens and API Keys
 var auth = require('./auth.json');
 var ytAPIKey = auth.youtube_api_key;
 var discordToken = auth.discord_token;
-
-const logDir = './logs/';
-const fileDir = './files/';
-const pluginDir = './plugins/';
 
 // create files directory if it does not exist
 if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
 
 // create logs directory if it does not exist
 if (!fs.existsSync(logDir)) fs.mkdirSync(logdir);
+
+// create servers directory if it does not exist
+if (!fs.existsSync(serverDir)) fs.mkdirSync(serverDir);
 
 // load plugins
 fs.readdirSync(pluginDir).forEach(function (file) {

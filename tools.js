@@ -1,8 +1,20 @@
 var fs = require('fs');
 
+var main = require('./bot.js');
+
+var muted = {}
+
 module.exports = {
-    updateMuted: function () {
-        fs.writeFile("../muted.json", JSON.stringify(mutedusers, null, 2), null);
+    getMuted: function () {
+        return muted;
+    },
+
+    setMuted: function (input) {
+        muted = input;
+    },
+
+    updateMuted: function (server) {
+        fs.writeFile(main.serverDir + server.id + '/muted.json', JSON.stringify(muted[server.id], null, 2), null);
     },
 
     sleep: function (milliseconds) { // unused

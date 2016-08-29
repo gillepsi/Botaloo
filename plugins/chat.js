@@ -1,11 +1,5 @@
-
-const fileDir = './files';
-
-try {
-    mutedusers = require("./muted.json");
-} catch (e) {
-    mutedusers = {};
-}
+var main = require('../bot.js');
+var tools = require('../tools.js');
 
 exports.commands = [
     'version',
@@ -77,16 +71,24 @@ exports.mute = {
     process: function (bot, msg, arg) {
         var user = msg.channel.server.members.get('username', arg);
 
-        if (!user) bot.sendMessage(msg.channel, 'User not found :cry:');
-        if (mutedusers.hasOwnProperty(user.id)) {
-            if (msg.author.id != user.id) delete mutedusers[user.id];
+        if (!user) {
+            bot.sendMessage(msg.channel, 'User not found :cry:');
+            return;
+        }
+
+        var list = tools.getMuted();
+        if (list[msg.server.id][user.id]) {
+            delete list[msg.server.id][user.id];
+            tools.setMuted(list);
+            tools.updateMuted(msg.server);
             bot.sendMessage(msg.channel, 'Unmuted ' + user.username + ' :ok_hand:');
         } else {
-            mutedusers[user.id] = {
+            list[msg.server.id][user.id] = {
                 id: user.id,
                 username: user.username
             };
-            tools.updateMuted();
+            tools.setMuted(list);
+            tools.updateMuted(msg.server);
             bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
         }
     }

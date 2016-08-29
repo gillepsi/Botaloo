@@ -1,8 +1,9 @@
+var fs = require('fs');
+
+var main = require('./bot.js');
 var tools = require('./tools.js');
 
 const prefix = 'botaloo ';
-
-var main = require('./bot.js');
 
 var flags = {
     'd': {
@@ -42,8 +43,8 @@ module.exports = {
 
     message: function (message) {
         var bot = main.getBot();
-
-        if (mutedusers.hasOwnProperty(message.author.id)) {
+        
+        if (tools.getMuted()[message.server.id][message.author.id]) {
             message.delete(function (error) {
                 bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
             });
@@ -79,10 +80,20 @@ module.exports = {
 
     ready: function () {
         var bot = main.getBot();
-
         console.log(tools.getTimestamp() + 'Ready to begin');
         for (var i = 0; i < bot.servers.length; i++) {
-            console.log(bot.servers[i].name + ' - ' + bot.servers[i].channels.length + ' channels');
+            var server = bot.servers[i];
+            console.log(server.name + ' - ' + server.channels.length + ' channels');
+            if (!fs.existsSync(main.serverDir + server.id)) fs.mkdirSync(main.serverDir + server.id);
+            try {
+                var list = tools.getMuted();
+                list[server.id] = require(main.serverDir + server.id + '/muted.json');
+                tools.setMuted(list);
+            } catch (error) {
+                var list = tools.getMuted();
+                list[server.id] = {};
+                tools.setMuted(list);
+            }
         }
         bot.setPlayingGame('github.com/slypher/botaloo');
     },

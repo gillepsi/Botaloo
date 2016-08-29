@@ -5,7 +5,7 @@
 node_modules
 logs
 files
+servers
 
 # JSON Files
 auth.json
-muted.json
