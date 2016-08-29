@@ -11,6 +11,13 @@ var auth = require('./auth.json');
 var ytAPIKey = auth.youtube_api_key;
 var discordToken = auth.discord_token;
 
+// create music directory if it does not exist
+if (!fs.existsSync('./music')) fs.mkdirSync('./music');
+
+// create logs directory if it does not exist
+if (!fs.existsSync('./logs')) fs.mkdirSync('./logs');
+
+// load list of muted users if it exists
 try {
     mutedusers = require("./muted.json");
 } catch (e) {
@@ -325,10 +332,10 @@ var commands = {
         }
     },
 
-    'eval': {		
-		description: 'executes arbitrary javascript',
+    'eval': {
+        description: 'executes arbitrary javascript',
         usage: '<command>',
-		process: function(msg, arg) {
+        process: function (msg, arg) {
             if (msg.author.hasRole(msg.server.roles.get('name', 'Staff'))) eval(arg);
         }
     },

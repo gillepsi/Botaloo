@@ -1,13 +1,11 @@
+# VSCode folder
+.vscode
+
+# Folders
 node_modules
-
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-
 logs
-*.log
 music
 
+# JSON Files
 auth.json
 muted.json
