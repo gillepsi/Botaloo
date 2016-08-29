@@ -43,7 +43,7 @@ module.exports = {
 
     message: function (message) {
         var bot = main.getBot();
-        
+
         if (tools.getMuted()[message.server.id][message.author.id]) {
             message.delete(function (error) {
                 bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
