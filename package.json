@@ -1,0 +1,20 @@
+{
+  "name": "botaloo",
+  "version": "0.1.0",
+  "description": "A discord bot.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Slypher/Botaloo.git"
+  },
+  "author": "Slypher",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^8.1.0",
+    "request": "^2.74.0",
+    "ytdl-core": "^0.7.17"
+  }
+}

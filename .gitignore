@@ -1,0 +1,11 @@
+node_modules
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+logs
+*.log
+music
+auth.json
