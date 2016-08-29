@@ -2,6 +2,7 @@ var fs = require('fs');
 
 var main = require('./bot.js');
 var tools = require('./tools.js');
+var config = require ('./config.json');
 
 const prefix = 'botaloo ';
 
@@ -84,10 +85,10 @@ module.exports = {
         for (var i = 0; i < bot.servers.length; i++) {
             var server = bot.servers[i];
             console.log(server.name + ' - ' + server.channels.length + ' channels');
-            if (!fs.existsSync(main.serverDir + server.id)) fs.mkdirSync(main.serverDir + server.id);
+            if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id);
             try {
                 var list = tools.getMuted();
-                list[server.id] = require(main.serverDir + server.id + '/muted.json');
+                list[server.id] = require(config.serverDir + server.id + '/muted.json');
                 tools.setMuted(list);
             } catch (error) {
                 var list = tools.getMuted();

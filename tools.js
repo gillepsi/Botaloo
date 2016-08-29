@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-var main = require('./bot.js');
+var config = require('./config.json');
 
 var muted = {}
 
@@ -14,7 +14,7 @@ module.exports = {
     },
 
     updateMuted: function (server) {
-        fs.writeFile(main.serverDir + server.id + '/muted.json', JSON.stringify(muted[server.id], null, 2), null);
+        fs.writeFile(config.serverDir + server.id + '/muted.json', JSON.stringify(muted[server.id], null, 2), null);
     },
 
     sleep: function (milliseconds) { // unused

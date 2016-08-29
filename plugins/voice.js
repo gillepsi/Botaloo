@@ -1,7 +1,7 @@
 var request = require('request');
 var ytdl = require('ytdl-core');
 
-var main = require('../bot.js');
+var config = require('../config.json');
 var ytAPIKey = require('../auth.json').youtube_api_key;
 
 exports.commands = [
@@ -53,7 +53,7 @@ exports.dl = {
             var video = videos[0];
             url = 'https://youtube.com/watch?v=' + video.id.videoId;
 
-            ytdl(url, { filter: 'audioonly', quality: 'highest' }).pipe(fs.createWriteStream('../' + main.fileDir + video.id.videoId + '.webm'));
+            ytdl(url, { filter: 'audioonly', quality: 'highest' }).pipe(fs.createWriteStream('../' + config.fileDir + video.id.videoId + '.webm'));
         });
     }
 }
@@ -61,7 +61,7 @@ exports.dl = {
 exports.list = {
     description: 'lists all music available',
     process: function (bot, msg, arg) {
-        var dir = '../' + main.fileDir;
+        var dir = '../' + config.fileDir;
         var response = '';
 
         fs.readdirSync(dir).forEach(function (file) {

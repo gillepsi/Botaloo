@@ -1,0 +1,6 @@
+{
+    "logDir": "./logs/",
+    "fileDir": "./files/",
+    "serverDir": "./servers/",
+    "pluginDir": "./plugins/"
+}

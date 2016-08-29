@@ -2,39 +2,20 @@ var Discord = require('discord.js');
 var fs = require('fs');
 
 var events = require('./events.js');
-var tools = require('./tools.js');
+var config = require('./config.json');
 var bot = new Discord.Client();
 
 exports.getBot = function () {
     return bot;
 }
 
-const logDir = './logs/';
-const fileDir = './files/';
-const serverDir = './servers/';
-const pluginDir = './plugins/';
-
-exports.logDir = logDir;
-exports.fileDir = fileDir;
-exports.serverDir = serverDir;
-exports.pluginDir = pluginDir;
-
-// contains tokens and API Keys
-var auth = require('./auth.json');
-var ytAPIKey = auth.youtube_api_key;
-var discordToken = auth.discord_token;
-
-// create files directory if it does not exist
-if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
-
-// create logs directory if it does not exist
-if (!fs.existsSync(logDir)) fs.mkdirSync(logdir);
-
-// create servers directory if it does not exist
-if (!fs.existsSync(serverDir)) fs.mkdirSync(serverDir);
+// create directories if they don't exist
+if (!fs.existsSync(config.fileDir)) fs.mkdirSync(config.fileDir);
+if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logdir);
+if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 
 // load plugins
-fs.readdirSync(pluginDir).forEach(function (file) {
+fs.readdirSync(config.pluginDir).forEach(function (file) {
     plugin = require(pluginDir + file);
     for (var i = 0; i < plugin.commands.length; i++) {
         events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);

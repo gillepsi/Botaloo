@@ -1,4 +1,3 @@
-var main = require('../bot.js');
 var tools = require('../tools.js');
 
 exports.commands = [
