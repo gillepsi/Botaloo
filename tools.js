@@ -1,3 +1,4 @@
+"use strict";
 module.exports = {
     getTimestamp: function () { // used for timestamp in console / log
         var date = new Date();

@@ -1,3 +1,4 @@
+"use strict";
 var fs = require('fs');
 
 var tools = require('../tools.js');
@@ -24,6 +25,7 @@ exports.commands = [
     'say',
     'mute',
     'eval'
+    // clear
 ]
 
 exports.events = [
@@ -54,6 +56,8 @@ exports.pm = {
     usage: '<username> <message>',
     description: 'private message a user',
     process: function (bot, msg, arg) {
+        if (!msg.server) return;
+
         var whitespace = arg.indexOf(' ');
         var target = '';
         target = arg.substring(0, whitespace);
@@ -61,10 +65,7 @@ exports.pm = {
         var pm = arg.substring(whitespace + 1);
         if (pm == '') pm = 'Hello!';
 
-        if (target == '') {
-            bot.sendMessage(msg.channel, 'Supply a username.');
-            return;
-        }
+        if (target == '') return bot.sendMessage(msg.channel, 'Supply a username.');
 
         var users = msg.channel.server.members.getAll('username', target);
 
@@ -99,10 +100,7 @@ exports.mute = {
 
         var user = msg.channel.server.members.get('username', arg);
 
-        if (!user) {
-            bot.sendMessage(msg.channel, 'User not found :cry:');
-            return;
-        }
+        if (!user) return bot.sendMessage(msg.channel, 'User not found :cry:');
 
         var list = exports.getMuted();
         if (list[msg.server.id][user.id]) {
@@ -126,7 +124,10 @@ exports.eval = {
     description: 'executes arbitrary javascript',
     usage: '<command>',
     process: function (bot, msg, arg) {
-        if (msg.server) if (msg.author.hasRole(msg.server.roles.get('name', 'Staff'))) eval(arg);
+        if (msg.server) {
+            var has_permission = msg.author.hasRole(msg.server.roles.get('name', 'Staff'));
+            if (has_permission) bot.sendMessage(msg.channel, '```' + eval(arg) + '```');
+        }
     }
 }
 

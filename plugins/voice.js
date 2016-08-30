@@ -1,3 +1,4 @@
+"use strict";
 var request = require('request');
 var fs = require('fs');
 var ytdl = require('ytdl-core');
@@ -9,10 +10,10 @@ exports.commands = [
     'join',
     'leave',
     'play',
+    'volume',
     'pause',
     'resume',
-    'stop',
-    'volume'
+    'stop'
 ]
 
 exports.events = []
@@ -55,10 +56,7 @@ exports.play = {
 
         var connection = bot.voiceConnections.get('server', msg.server);
 
-        if (!connection) {
-            bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
-            return;
-        }
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
 
         if (arg === '') {
             if (connection.paused) connection.resume();
@@ -77,16 +75,10 @@ exports.play = {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
             request(searchURL, function (error, response) {
                 var payload = JSON.parse(response.body);
-                if (payload['items'].length == 0) {
-                    bot.sendMessage(msg.channel, 'Didn\'t find anything :cry:');
-                    return;
-                }
+                if (payload['items'].length == 0) return bot.sendMessage(msg.channel, 'Didn\'t find anything :cry:');
 
                 var videos = payload.items.filter(item => item.id.kind === 'youtube#video');
-                if (videos.length === 0) {
-                    bot.sendMessage(msg.channel, 'Didn\'t find any video :cry:');
-                    return;
-                }
+                if (videos.length === 0) return bot.sendMessage(msg.channel, 'Didn\'t find any video :cry:');
 
                 var video = videos[0];
                 var stream = ytdl('https://youtube.com/watch?v=' + video.id.videoId, { filter: 'audioonly', quality: 'highest' });
@@ -96,14 +88,22 @@ exports.play = {
     }
 }
 
+exports.volume = {
+    description: 'set the volume',
+    usage: '<number>',
+    process: function (bot, msg, arg) {
+        var connection = bot.voiceConnections.get('server', msg.server);
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+
+        if (arg) connection.setVolume(arg);
+    }
+}
+
 exports.pause = {
     description: 'pause playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) {
-            bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
-            return;
-        }
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
         if (connection.playing) connection.pause();
     }
 }
@@ -112,10 +112,7 @@ exports.resume = {
     description: 'resume playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) {
-            bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
-            return;
-        }
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
         if (connection.paused) connection.resume();
     }
 }
@@ -124,24 +121,7 @@ exports.stop = {
     description: 'stop playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) {
-            bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
-            return;
-        }
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
         if (connection.playing || connection.paused) connection.stopPlaying();
-    }
-}
-
-exports.volume = {
-    description: 'set the volume',
-    usage: '<number>',
-    process: function (bot, msg, arg) {
-        var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) {
-            bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
-            return;
-        }
-
-        if (arg) connection.setVolume(arg);
     }
 }

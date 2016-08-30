@@ -1,3 +1,4 @@
+"use strict";
 exports.commands = []
 
 exports.events = []

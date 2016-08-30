@@ -1,3 +1,4 @@
+"use strict";
 var Discord = require('discord.js');
 var util = require('util');
 var fs = require('fs');
@@ -30,7 +31,7 @@ if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 
 // load plugins
 fs.readdirSync(config.pluginDir).forEach(function (file) {
-    plugin = require(config.pluginDir + file);
+    var plugin = require(config.pluginDir + file);
     for (var i = 0; i < plugin.commands.length; i++) events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);
     for (var i = 0; i < plugin.events.length; i++) events.addEvent(plugin.events[i], plugin[plugin.events[i]]);
     for (var i = 0; i < plugin.flags.length; i++) events.addFlag(plugin.flags[i], plugin[plugin.flags[i]]);
