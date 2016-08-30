@@ -11,4 +11,5 @@ A chat bot for discord based off [discord.js] (https://github.com/hydrabolt/disc
 3. `npm install`
 4. `node bot.js`
 
-[Install nodejs] (http://nodejs.org/)
+Install [nodejs] (http://nodejs.org/)
+[Troubleshooting] (http://discordjs.readthedocs.io/en/latest/troubleshooting.html)
