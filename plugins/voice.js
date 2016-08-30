@@ -1,4 +1,5 @@
-var request = require('request');
+var request = require('superagent');
+var fs = require('fs');
 var ytdl = require('ytdl-core');
 
 var config = require('../config.json');
@@ -53,7 +54,7 @@ exports.dl = {
             var video = videos[0];
             url = 'https://youtube.com/watch?v=' + video.id.videoId;
 
-            ytdl(url, { filter: 'audioonly', quality: 'highest' }).pipe(fs.createWriteStream('../' + config.fileDir + video.id.videoId + '.webm'));
+            ytdl(url, { filter: 'audioonly', quality: 'highest' }).pipe(fs.createWriteStream(config.fileDir + video.id.videoId + '.webm'));
         });
     }
 }
@@ -61,7 +62,7 @@ exports.dl = {
 exports.list = {
     description: 'lists all music available',
     process: function (bot, msg, arg) {
-        var dir = '../' + config.fileDir;
+        var dir = config.fileDir;
         var response = '';
 
         fs.readdirSync(dir).forEach(function (file) {
@@ -81,7 +82,7 @@ exports.play = {
             return;
         }
 
-        connection.playRawStream(request(arg), function (intent) {
+        /*connection.playRawStream(request(arg), function (intent) {
             if (connection.playing) bot.sendMessage(msg.channel, 'Now playing :ok_hand:');
             intent.on('end', function () {
                 bot.sendMessage(msg.channel, 'Finished playing :ok_hand:');
@@ -94,7 +95,26 @@ exports.play = {
             intent.on('time', function (time) {
                 bot.sendMessage(msg.channel, '20ms checkpoint - ' + time + 'ms total');
             })
-        });
+        });*/
+        console.log('[' + arg + ']');
+        //var connection = bot.internal.voiceConnection;
+			// ...get the request module which will be used to load the URL...
+			var request = require("request");
+			// ...get the stream from the URL...
+			var stream = request(arg);
+			// ...and play it back
+			connection.playRawStream(stream).then(intent => {
+				// If the playback has started successfully, reply with a "playing"
+				// message...
+				bot.reply(msg, "playing!").then((message) => {
+					// and add an event handler that tells the user when the song has
+					// finished
+					intent.on("end", () => {
+						// Edit the "playing" message to say that the song has finished
+						bot.updateMessage(message, "that song has finished now.");
+					});
+				});
+			});
     }
 }
 
@@ -106,8 +126,7 @@ exports.pause = {
             bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
             return;
         }
-        connection.pause();
-
+        if (connection.playing) connection.pause();
     }
 }
 
@@ -119,7 +138,7 @@ exports.resume = {
             bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
             return;
         }
-        connection.resume();
+        if (connection.paused) connection.resume();
     }
 }
 
@@ -131,6 +150,6 @@ exports.stop = {
             bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
             return;
         }
-        connection.stopPlaying();
+        if (connection.playing || connection.paused) connection.stopPlaying();
     }
 }

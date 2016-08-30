@@ -31,5 +31,6 @@ bot.on('ready', events.ready);
 bot.on('disconnected', events.disconnected);
 bot.on('warn', events.warn);
 bot.on('error', events.error);
+bot.on('debug', events.debug);
 
 bot.loginWithToken(discord_token);

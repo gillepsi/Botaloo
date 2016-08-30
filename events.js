@@ -8,7 +8,19 @@ const prefix = 'botaloo ';
 
 var flags = {
     'd': {
-        description: 'deletes your command message'
+        bool: false,
+        description: 'deletes your command message',
+        process: function (bot, msg, arg) {
+            msg.delete();
+        }
+    },
+
+    'm': {
+        bool: false,
+        description: 'bot will not send a response',
+        process: function (bot, msg, arg) {
+
+        }
     }
 };
 
@@ -53,8 +65,7 @@ module.exports = {
 
         var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();
         if (msgPrefix === prefix.replace(/\s/g, '').toLowerCase()) {
-            var flagBools = [];
-            for (flag in flags) flagBools.push(false);
+            for (flag in flags) flags[flag].bool = false;
             var cmd = message.content.substring(prefix.length);
             console.log(tools.getTimestamp() + cmd + ' from @' + message.author.username);
 
@@ -64,7 +75,7 @@ module.exports = {
             for (var flag in flags) {
                 var flagpos = cmd.indexOf('-' + flag);
                 if (flagpos != -1) {
-                    flagBools[tools.arrayIndexOf(flags, flag)] = true;
+                    flags[flag].bool = true;
                     cmd = cmd.substring(0, flagpos - 1) + cmd.substring(flagpos + 2, cmd.length);
                 }
             }
@@ -75,7 +86,7 @@ module.exports = {
             }
 
             // execute flags - probably a bad implementation need to rewrite
-            if (flagBools[0]) message.delete();
+            for (flag in flags) if(flags[flag].bool) flags[flag].process(main.getBot(), message, cmd);
         }
     },
 
@@ -99,16 +110,19 @@ module.exports = {
         bot.setPlayingGame('github.com/slypher/botaloo');
     },
 
-    disconnected: function () {
-        console.log(tools.getTimeStamp() + 'Disconnected');
+    disconnected: function (m) {
+        console.log(tools.getTimestamp() + '[Disconnected] ' + m);
     },
 
-    warn: function () {
-        console.log(tools.getTimeStamp() + 'Warning');
+    warn: function (m) {
+        console.log(tools.getTimestamp() + '[Warning] ' + m);
     },
 
-    error: function (error) {
-        console.log(tools.getTimeStamp() + 'Error');
-        console.log(error);
+    error: function (m) {
+        console.log(tools.getTimestamp() + '[Error] ' + m);
+    },
+
+    debug: function (m) {
+        console.log(tools.getTimestamp() + '[Debug] ' + m);
     }
 }
