@@ -36,9 +36,7 @@ exports.play = {
     description: 'play a youtube video',
     usage: '<url/title>',
     process: function (bot, msg, arg) {
-        playUrl = function (bot, msg, url) {
-            var stream = ytdl(url, { filter: 'audioonly', quality: 'highest' });
-
+        playStream = function (bot, msg, stream) {
             connection.playRawStream(stream, function (intent) {
                 if (connection.playing) bot.sendMessage(msg.channel, 'Now playing :ok_hand:');
                 intent.on('end', function () {
@@ -63,7 +61,15 @@ exports.play = {
             return;
         }
 
-        if (!arg.includes('youtube.com')) {
+        if (arg.substring(0, 7).toLowerCase() === 'http://' || arg.substring(0, 8).toLowerCase() === 'https://') {
+            var stream;
+            if (arg.includes('youtube.com')) {
+                stream = ytdl(arg, { filter: 'audioonly', quality: 'highest' });
+            } else {
+                stream = request.get(arg);
+            }
+            playStream(bot, msg, stream);
+        } else {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
             request(searchURL, function (error, response) {
                 var payload = JSON.parse(response.body);
@@ -79,10 +85,9 @@ exports.play = {
                 }
 
                 var video = videos[0];
-                playUrl(bot, msg, 'https://youtube.com/watch?v=' + video.id.videoId);
+                var stream = ytdl('https://youtube.com/watch?v=' + video.id.videoId, { filter: 'audioonly', quality: 'highest' });
+                playStream(bot, msg, stream);
             });
-        } else {
-            playUrl(bot, msg, arg);
         }
     }
 }
@@ -132,7 +137,7 @@ exports.setvolume = {
             bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
             return;
         }
-        
+
         if (arg) connection.setVolume(arg);
     }
 }
