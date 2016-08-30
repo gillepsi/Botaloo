@@ -1,4 +1,5 @@
 var Discord = require('discord.js');
+var util = require('util');
 var fs = require('fs');
 
 var events = require('./events.js');
@@ -7,6 +8,13 @@ var auth = require ('./auth.json');
 var bot = new Discord.Client();
 
 var discord_token = auth.discord_token;
+var log_file = fs.createWriteStream(config.logDir + 'debug.log', {flags : 'w'});
+var log_stdout = process.stdout;
+
+console.log = function(d) { //
+  log_file.write(util.format(d) + '\r\n');
+  log_stdout.write(util.format(d) + '\n');
+};
 
 exports.getBot = function () {
     return bot;
@@ -26,11 +34,11 @@ fs.readdirSync(config.pluginDir).forEach(function (file) {
 });
 
 // event handlers
-bot.on('message', events.message);
 bot.on('ready', events.ready);
 bot.on('disconnected', events.disconnected);
 bot.on('warn', events.warn);
 bot.on('error', events.error);
 bot.on('debug', events.debug);
+bot.on('message', events.message);
 
 bot.loginWithToken(discord_token);

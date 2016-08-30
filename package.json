@@ -1,6 +1,6 @@
 {
   "name": "botaloo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A discord bot using discord.js",
   "main": "bot.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "child_process": "^1.0.2",
     "discord.js": "^8.1.0",
     "request": "^2.74.0",
-    "superagent": "^2.2.0",
+    "util": "^0.10.3",
     "ytdl-core": "^0.7.17"
   }
 }
