@@ -12,7 +12,7 @@ exports.commands = [
     'pause',
     'resume',
     'stop',
-    'setvolume'
+    'volume'
 ]
 
 exports.events = []
@@ -132,9 +132,9 @@ exports.stop = {
     }
 }
 
-exports.setvolume = {
+exports.volume = {
     description: 'set the volume',
-    usage: '<volume>',
+    usage: '<number>',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
         if (!connection) {
