@@ -132,6 +132,7 @@ exports.setvolume = {
             bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
             return;
         }
-        connection.setVolume(arg);
+        
+        if (arg) connection.setVolume(arg);
     }
 }
