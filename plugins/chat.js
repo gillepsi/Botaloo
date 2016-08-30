@@ -1,4 +1,22 @@
+var fs = require('fs');
+
 var tools = require('../tools.js');
+var config = require('../config.json');
+
+var muted = {};
+
+exports.getMuted = function () {
+    return muted;
+}
+
+exports.setMuted = function (input) {
+    muted = input;
+}
+
+exports.updateMuted = function (server) {
+    fs.writeFile(config.serverDir + server.id + '/muted.json', JSON.stringify(muted[server.id], null, 2), null);
+}
+
 
 exports.commands = [
     'version',
@@ -6,6 +24,15 @@ exports.commands = [
     'say',
     'mute',
     'eval'
+]
+
+exports.events = [
+    'ready',
+    'message'
+]
+
+exports.flags = [
+    'm'
 ]
 
 exports.version = {
@@ -77,19 +104,19 @@ exports.mute = {
             return;
         }
 
-        var list = tools.getMuted();
+        var list = exports.getMuted();
         if (list[msg.server.id][user.id]) {
             delete list[msg.server.id][user.id];
-            tools.setMuted(list);
-            tools.updateMuted(msg.server);
+            exports.setMuted(list);
+            exports.updateMuted(msg.server);
             bot.sendMessage(msg.channel, 'Unmuted ' + user.username + ' :ok_hand:');
         } else {
             list[msg.server.id][user.id] = {
                 id: user.id,
                 username: user.username
             };
-            tools.setMuted(list);
-            tools.updateMuted(msg.server);
+            exports.setMuted(list);
+            exports.updateMuted(msg.server);
             bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
         }
     }
@@ -102,3 +129,47 @@ exports.eval = {
         if (msg.server) if (msg.author.hasRole(msg.server.roles.get('name', 'Staff'))) eval(arg);
     }
 }
+
+exports.ready = function (bot) {
+    for (var i = 0; i < bot.servers.length; i++) {
+        var server = bot.servers[i];
+        try {
+            var list = exports.getMuted();
+            list[server.id] = require(config.serverDir + server.id + '/muted.json');
+            exports.setMuted(list);
+        } catch (error) {
+            var list = exports.getMuted();
+            list[server.id] = {};
+            exports.setMuted(list);
+        }
+    }
+}
+
+exports.message = function (bot, message) {
+    if (message.server) {
+        if (exports.getMuted()[message.server.id][message.author.id]) {
+            message.delete(function (error) {
+                bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
+            });
+        }
+
+        if (exports.getMuted()[message.server.id][bot.user.id]) {
+            var list = exports.getMuted();
+            delete list[message.server.id][bot.user.id];
+            exports.setMuted(list);
+        }
+    }
+}
+
+exports.m = {
+        bool: false,
+        description: 'bot will not send a response',
+        process: function (bot, msg, arg) {
+            var list = exports.getMuted();
+            list[msg.server.id][bot.user.id] = {
+                id: bot.user.id,
+                username: bot.user.username
+            };
+            exports.setMuted(list);
+        }
+    }

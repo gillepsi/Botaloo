@@ -15,6 +15,10 @@ exports.commands = [
     'setvolume'
 ]
 
+exports.events = []
+
+exports.flags = []
+
 exports.join = {
     description: 'joins your voice channel',
     process: function (bot, msg, arg) {

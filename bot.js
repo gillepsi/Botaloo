@@ -30,15 +30,15 @@ if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 // load plugins
 fs.readdirSync(config.pluginDir).forEach(function (file) {
     plugin = require(config.pluginDir + file);
-    for (var i = 0; i < plugin.commands.length; i++) {
-        events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);
-    }
+    for (var i = 0; i < plugin.commands.length; i++) events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);
+    for (var i = 0; i < plugin.events.length; i++) events.addEvent(plugin.events[i], plugin[plugin.events[i]]);
+    for (var i = 0; i < plugin.flags.length; i++) events.addFlag(plugin.flags[i], plugin[plugin.flags[i]]);
 });
 
 // event handlers
 bot.on('ready', events.ready);
 bot.on('disconnected', events.disconnected);
-bot.on('warn', events.warn);
+//bot.on('warn', events.warn);
 bot.on('error', events.error);
 bot.on('debug', events.debug);
 bot.on('message', events.message);

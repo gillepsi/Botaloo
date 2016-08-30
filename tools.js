@@ -2,20 +2,7 @@ var fs = require('fs');
 
 var config = require('./config.json');
 
-var muted = {}
-
 module.exports = {
-    getMuted: function () {
-        return muted;
-    },
-
-    setMuted: function (input) {
-        muted = input;
-    },
-
-    updateMuted: function (server) {
-        fs.writeFile(config.serverDir + server.id + '/muted.json', JSON.stringify(muted[server.id], null, 2), null);
-    },
 
     sleep: function (milliseconds) { // unused
         var currentTime = new Date().getTime();

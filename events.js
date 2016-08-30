@@ -6,25 +6,21 @@ var config = require('./config.json');
 
 const prefix = 'botaloo ';
 
+var events = {
+    'message': {},
+    'ready': { },
+    'disconnected': {},
+    'warn': {},
+    'error': {},
+    'debug': {}
+}
+
 var flags = {
     'd': {
         bool: false,
         description: 'deletes your command message',
         process: function (bot, msg, arg) {
             msg.delete();
-        }
-    },
-
-    'm': {
-        bool: false,
-        description: 'bot will not send a response',
-        process: function (bot, msg, arg) {
-            var list = tools.getMuted();
-            list[msg.server.id][bot.user.id] = {
-                id: bot.user.id,
-                username: bot.user.username
-            };
-            tools.setMuted(list);
         }
     }
 };
@@ -59,22 +55,17 @@ module.exports = {
         commands[name] = object;
     },
 
+    addEvent: function (event, process) {
+        events[event][Object.keys(events[event]).length] = process;
+    },
+
+    addFlag: function (name, object) {
+        flags[name] = object;
+    },
+
     message: function (message) {
         var bot = main.getBot();
-
-        if (message.server) {
-            if (tools.getMuted()[message.server.id][message.author.id]) {
-                message.delete(function (error) {
-                    bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
-                });
-            }
-
-            if (tools.getMuted()[message.server.id][bot.user.id]) {
-                var list = tools.getMuted();
-                delete list[message.server.id][bot.user.id];
-                tools.setMuted(list);
-            }
-        }
+        for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message);
 
         var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();
         if (msgPrefix === prefix.replace(/\s/g, '').toLowerCase()) {
@@ -105,37 +96,38 @@ module.exports = {
 
     ready: function () {
         var bot = main.getBot();
+        for (var i = 0; i < Object.keys(events['ready']).length; i++) events['ready'][i](bot);
+
         console.log(tools.getTimestamp() + ' Ready to begin');
         for (var i = 0; i < bot.servers.length; i++) {
             var server = bot.servers[i];
             console.log(server.name + ' - ' + server.channels.length + ' channels');
             if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id);
-            try {
-                var list = tools.getMuted();
-                list[server.id] = require(config.serverDir + server.id + '/muted.json');
-                tools.setMuted(list);
-            } catch (error) {
-                var list = tools.getMuted();
-                list[server.id] = {};
-                tools.setMuted(list);
-            }
         }
         bot.setPlayingGame('github/slypher/botaloo');
     },
 
     disconnected: function (m) {
+        var bot = main.getBot();
+        for (var i = 0; i < Object.keys(events['disconnected']).length; i++) events['disconnected'][i](bot, m);
         console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
     },
 
     warn: function (m) {
+        var bot = main.getBot();
+        for (var i = 0; i < Object.keys(events['warn']).length; i++) events['warn'][i](bot, m);
         console.log(tools.getTimestamp() + ' [Warning] ' + m);
     },
 
     error: function (m) {
+        var bot = main.getBot();
+        for (var i = 0; i < Object.keys(events['error']).length; i++) events['error'][i](bot, m);
         console.log(tools.getTimestamp() + ' [Error] ' + m);
     },
 
     debug: function (m) {
+        var bot = main.getBot();
+        for (var i = 0; i < Object.keys(events['debug']).length; i++) events['debug'][i](bot, message);
         console.log(tools.getTimestamp() + ' [Debug] ' + m);
     }
 }
