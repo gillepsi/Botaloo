@@ -1,25 +1,4 @@
-var fs = require('fs');
-
-var config = require('./config.json');
-
 module.exports = {
-
-    sleep: function (milliseconds) { // unused
-        var currentTime = new Date().getTime();
-
-        while (currentTime + milliseconds >= new Date().getTime()) {
-        }
-    },
-
-    arrayIndexOf: function (myArray, searchTerm) { // used in flags
-        var index = 0;
-        for (var i in myArray) {
-            if (i === searchTerm) return index;
-            index += 1;
-        }
-        return -1;
-    },
-
     getTimestamp: function () { // used for timestamp in console / log
         var date = new Date();
 

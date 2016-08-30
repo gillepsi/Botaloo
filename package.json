@@ -13,6 +13,7 @@
   "author": "Slypher",
   "license": "MIT",
   "dependencies": {
+    "child_process": "^1.0.2",
     "discord.js": "^8.1.0",
     "request": "^2.74.0",
     "util": "^0.10.3",

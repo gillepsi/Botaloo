@@ -162,14 +162,14 @@ exports.message = function (bot, message) {
 }
 
 exports.m = {
-        bool: false,
-        description: 'bot will not send a response',
-        process: function (bot, msg, arg) {
-            var list = exports.getMuted();
-            list[msg.server.id][bot.user.id] = {
-                id: bot.user.id,
-                username: bot.user.username
-            };
-            exports.setMuted(list);
-        }
+    bool: false,
+    description: 'bot will not send a response',
+    process: function (bot, msg, arg) {
+        var list = exports.getMuted();
+        list[msg.server.id][bot.user.id] = {
+            id: bot.user.id,
+            username: bot.user.username
+        };
+        exports.setMuted(list);
     }
+}

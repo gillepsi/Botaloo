@@ -1,4 +1,6 @@
 {
+    "game": "github.com/slypher/botaloo",
+    "prefix": "botaloo ",
     "logDir": "./logs/",
     "fileDir": "./files/",
     "serverDir": "./servers/",

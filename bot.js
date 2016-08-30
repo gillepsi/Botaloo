@@ -13,6 +13,7 @@ var discord_token = auth.discord_token;
 var log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
 var log_stdout = process.stdout;
 
+// setup logging to the log directory
 console.log = function (d) {
     log_file.write(util.format(d) + '\r\n');
     log_stdout.write(util.format(d) + '\n');

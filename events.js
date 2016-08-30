@@ -4,11 +4,9 @@ var main = require('./bot.js');
 var tools = require('./tools.js');
 var config = require('./config.json');
 
-const prefix = 'botaloo ';
-
 var events = {
     'message': {},
-    'ready': { },
+    'ready': {},
     'disconnected': {},
     'warn': {},
     'error': {},
@@ -67,10 +65,10 @@ module.exports = {
         var bot = main.getBot();
         for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message);
 
-        var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();
-        if (msgPrefix === prefix.replace(/\s/g, '').toLowerCase()) {
+        var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase();
+        if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase()) {
             for (flag in flags) flags[flag].bool = false;
-            var cmd = message.content.substring(prefix.length);
+            var cmd = message.content.substring(config.prefix.length);
             console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
             if (cmd === '') bot.sendMessage(message.channel, 'That\'s me!');
@@ -89,7 +87,7 @@ module.exports = {
                 if (cmd.substring(0, c.length).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
             }
 
-            // execute flags - probably a bad implementation need to rewrite
+            // check flags
             for (flag in flags) if (flags[flag].bool) flags[flag].process(main.getBot(), message, cmd);
         }
     },
@@ -101,10 +99,10 @@ module.exports = {
         console.log(tools.getTimestamp() + ' Ready to begin');
         for (var i = 0; i < bot.servers.length; i++) {
             var server = bot.servers[i];
-            console.log(server.name + ' - ' + server.channels.length + ' channels');
+            console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
             if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id);
         }
-        bot.setPlayingGame('github/slypher/botaloo');
+        bot.setPlayingGame(config.game);
     },
 
     disconnected: function (m) {
