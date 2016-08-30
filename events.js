@@ -19,7 +19,12 @@ var flags = {
         bool: false,
         description: 'bot will not send a response',
         process: function (bot, msg, arg) {
-
+            var list = tools.getMuted();
+            list[msg.server.id][bot.user.id] = {
+                id: bot.user.id,
+                username: bot.user.username
+            };
+            tools.setMuted(list);
         }
     }
 };
@@ -61,6 +66,12 @@ module.exports = {
             message.delete(function (error) {
                 bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
             });
+        }
+
+        if (tools.getMuted()[message.server.id][bot.user.id]) {
+            var list = tools.getMuted();
+            delete list[message.server.id][bot.user.id];
+            tools.setMuted(list);
         }
 
         var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();

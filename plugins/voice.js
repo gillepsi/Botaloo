@@ -33,8 +33,8 @@ exports.leave = {
 }
 
 exports.play = {
-    description: 'play a video',
-    usage: '<url>',
+    description: 'play a youtube video',
+    usage: '<url/title>',
     process: function (bot, msg, arg) {
         playUrl = function (bot, msg, url) {
             var stream = ytdl(url, { filter: 'audioonly', quality: 'highest' });
@@ -124,7 +124,7 @@ exports.stop = {
 }
 
 exports.setvolume = {
-    description: 'set the volume of the current audio',
+    description: 'set the volume',
     usage: '<volume>',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);

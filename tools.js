@@ -20,7 +20,7 @@ module.exports = {
     sleep: function (milliseconds) { // unused
         var currentTime = new Date().getTime();
 
-        while (currentTime + miliseconds >= new Date().getTime()) {
+        while (currentTime + milliseconds >= new Date().getTime()) {
         }
     },
 
