@@ -2,7 +2,7 @@ var fs = require('fs');
 
 var main = require('./bot.js');
 var tools = require('./tools.js');
-var config = require ('./config.json');
+var config = require('./config.json');
 
 const prefix = 'botaloo ';
 
@@ -62,23 +62,25 @@ module.exports = {
     message: function (message) {
         var bot = main.getBot();
 
-        if (tools.getMuted()[message.server.id][message.author.id]) {
-            message.delete(function (error) {
-                bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
-            });
-        }
+        if (message.server) {
+            if (tools.getMuted()[message.server.id][message.author.id]) {
+                message.delete(function (error) {
+                    bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
+                });
+            }
 
-        if (tools.getMuted()[message.server.id][bot.user.id]) {
-            var list = tools.getMuted();
-            delete list[message.server.id][bot.user.id];
-            tools.setMuted(list);
+            if (tools.getMuted()[message.server.id][bot.user.id]) {
+                var list = tools.getMuted();
+                delete list[message.server.id][bot.user.id];
+                tools.setMuted(list);
+            }
         }
 
         var msgPrefix = message.content.substring(0, prefix.length).replace(/\s/g, '').toLowerCase();
         if (msgPrefix === prefix.replace(/\s/g, '').toLowerCase()) {
             for (flag in flags) flags[flag].bool = false;
             var cmd = message.content.substring(prefix.length);
-            console.log(tools.getTimestamp() + cmd + ' from @' + message.author.username);
+            console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
             if (cmd === '') bot.sendMessage(message.channel, 'That\'s me!');
 
@@ -97,7 +99,7 @@ module.exports = {
             }
 
             // execute flags - probably a bad implementation need to rewrite
-            for (flag in flags) if(flags[flag].bool) flags[flag].process(main.getBot(), message, cmd);
+            for (flag in flags) if (flags[flag].bool) flags[flag].process(main.getBot(), message, cmd);
         }
     },
 

@@ -63,7 +63,7 @@ exports.play = {
 
         if (arg.substring(0, 7).toLowerCase() === 'http://' || arg.substring(0, 8).toLowerCase() === 'https://') {
             var stream;
-            if (arg.includes('youtube.com')) {
+            if (arg.includes('youtube.com') || arg.includes('youtu.be')) {
                 stream = ytdl(arg, { filter: 'audioonly', quality: 'highest' });
             } else {
                 stream = request.get(arg);

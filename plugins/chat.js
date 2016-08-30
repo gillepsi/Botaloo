@@ -68,6 +68,8 @@ exports.mute = {
     description: 'mute a user',
     usage: '<username>',
     process: function (bot, msg, arg) {
+        if (!msg.server) return;
+
         var user = msg.channel.server.members.get('username', arg);
 
         if (!user) {
@@ -97,6 +99,6 @@ exports.eval = {
     description: 'executes arbitrary javascript',
     usage: '<command>',
     process: function (bot, msg, arg) {
-        if (msg.author.hasRole(msg.server.roles.get('name', 'Staff'))) eval(arg);
+        if (msg.server) if (msg.author.hasRole(msg.server.roles.get('name', 'Staff'))) eval(arg);
     }
 }
