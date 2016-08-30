@@ -48,6 +48,6 @@ module.exports = {
         var day = date.getDate();
         day = (day < 10 ? "0" : "") + day;
 
-        return '[' + day + ':' + hour + ':' + min + ':' + sec + '] ';
+        return '[' + day + ':' + hour + ':' + min + ':' + sec + ']';
     }
 }

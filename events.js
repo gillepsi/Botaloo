@@ -103,7 +103,7 @@ module.exports = {
 
     ready: function () {
         var bot = main.getBot();
-        console.log(tools.getTimestamp() + 'Ready to begin');
+        console.log(tools.getTimestamp() + ' Ready to begin');
         for (var i = 0; i < bot.servers.length; i++) {
             var server = bot.servers[i];
             console.log(server.name + ' - ' + server.channels.length + ' channels');
@@ -118,22 +118,22 @@ module.exports = {
                 tools.setMuted(list);
             }
         }
-        bot.setPlayingGame('github.com/slypher/botaloo');
+        bot.setPlayingGame('github/slypher/botaloo');
     },
 
     disconnected: function (m) {
-        console.log(tools.getTimestamp() + '[Disconnected] ' + m);
+        console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
     },
 
     warn: function (m) {
-        console.log(tools.getTimestamp() + '[Warning] ' + m);
+        console.log(tools.getTimestamp() + ' [Warning] ' + m);
     },
 
     error: function (m) {
-        console.log(tools.getTimestamp() + '[Error] ' + m);
+        console.log(tools.getTimestamp() + ' [Error] ' + m);
     },
 
     debug: function (m) {
-        console.log(tools.getTimestamp() + '[Debug] ' + m);
+        console.log(tools.getTimestamp() + ' [Debug] ' + m);
     }
 }

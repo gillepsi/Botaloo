@@ -3,15 +3,17 @@ var util = require('util');
 var fs = require('fs');
 
 var events = require('./events.js');
+var tools = require('./tools.js');
 var config = require('./config.json');
 var auth = require ('./auth.json');
+
 var bot = new Discord.Client();
 
 var discord_token = auth.discord_token;
-var log_file = fs.createWriteStream(config.logDir + 'debug.log', {flags : 'w'});
+var log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', {flags : 'w'});
 var log_stdout = process.stdout;
 
-console.log = function(d) { //
+console.log = function(d) {
   log_file.write(util.format(d) + '\r\n');
   log_stdout.write(util.format(d) + '\n');
 };
