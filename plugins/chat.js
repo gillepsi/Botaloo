@@ -35,7 +35,7 @@ exports.pm = {
     usage: '<username> <message>',
     description: 'private message a user',
     process: function (bot, msg, arg) {
-        if (!msg.server) return;
+        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
 
         var whitespace = arg.indexOf(' ');
         var target = '';
@@ -75,9 +75,11 @@ exports.eval = {
     description: 'executes arbitrary javascript',
     usage: '<command>',
     process: function (bot, msg, arg) {
-        if (msg.server) {
+        if (msg.server.name === 'Ghost Horde') {
             var has_permission = msg.author.hasRole(msg.server.roles.get('name', 'Staff'));
             if (has_permission) eval(arg);
+        } else {
+            bot.sendMessage(msg.channel, '```' + eval(arg) + '```');
         }
     }
 }
