@@ -1,9 +1,9 @@
 "use strict";
-var fs = require('fs');
+const fs = require('fs');
 
-var main = require('./bot.js');
-var tools = require('./tools.js');
-var config = require('./config.json');
+const main = require('./bot.js');
+const tools = require('./tools.js');
+const config = require('./config.json');
 
 var events = {
     'message': {},
@@ -85,7 +85,10 @@ module.exports = {
 
             // check commands
             for (var c in commands) {
-                if (cmd.substring(0, c.length).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
+                var whitespace = cmd.indexOf(' ');
+                if (whitespace === -1) whitespace = cmd.length;
+
+                if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
             }
 
             // check flags

@@ -1,20 +1,20 @@
 "use strict";
-var Discord = require('discord.js');
-var util = require('util');
-var fs = require('fs');
+const Discord = require('discord.js');
+const util = require('util');
+const fs = require('fs');
 
-var events = require('./events.js');
-var tools = require('./tools.js');
-var config = require('./config.json');
-var auth = require('./auth.json');
+const events = require('./events.js');
+const tools = require('./tools.js');
+const config = require('./config.json');
+const auth = require('./auth.json');
 
 try {
-    var bot = new Discord.Client({forceFetchUsers: true});
+    const bot = new Discord.Client({forceFetchUsers: true});
 
-    var discord_token = auth.discord_token;
-    var log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
-    var log_stdout = process.stdout;
-    var log_stderr = process.stderr;
+    const discord_token = auth.discord_token;
+    const log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
+    const log_stdout = process.stdout;
+    const log_stderr = process.stderr;
 
     // setup logging to the log directory
     console.log = function (d) {
@@ -34,7 +34,10 @@ try {
     // load plugins
     fs.readdirSync(config.pluginDir).forEach(function (file) {
         var plugin = require(config.pluginDir + file);
-        for (var i = 0; i < plugin.commands.length; i++) events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);
+        for (var i = 0; i < plugin.commands.length; i++) {
+            var esc_c = tools.escape(plugin.commands[i]);
+            events.addCommand(plugin.commands[i], plugin[esc_c]);
+        }
         for (var i = 0; i < plugin.events.length; i++) events.addEvent(plugin.events[i], plugin[plugin.events[i]]);
         for (var i = 0; i < plugin.flags.length; i++) events.addFlag(plugin.flags[i], plugin[plugin.flags[i]]);
     });

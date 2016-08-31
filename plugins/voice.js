@@ -1,10 +1,10 @@
 "use strict";
-var request = require('request');
-var fs = require('fs');
-var ytdl = require('ytdl-core');
+const request = require('request');
+const fs = require('fs');
+const ytdl = require('ytdl-core');
 
-var config = require('../config.json');
-var ytAPIKey = require('../auth.json').youtube_api_key;
+const config = require('../config.json');
+const ytAPIKey = require('../auth.json').youtube_api_key;
 
 exports.commands = [
     'join',

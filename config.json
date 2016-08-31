@@ -1,4 +1,5 @@
 {
+    "chars": ". \\ + * ? [ ^ ] $ ( ) { } = ! < > | : - ' \"",
     "game": "github.com/slypher/botaloo",
     "prefix": "botaloo ",
     "logDir": "./logs/",
