@@ -41,7 +41,7 @@ exports.play = {
     description: 'play a youtube video',
     usage: '<url/title>',
     process: function (bot, msg, arg) {
-        playStream = function (bot, msg, stream) {
+        var playStream = function (bot, msg, stream) {
             connection.playRawStream(stream, function (intent) {
                 if (connection.playing) bot.sendMessage(msg.channel, 'Now playing :ok_hand:');
                 intent.on('end', function () {
@@ -70,7 +70,7 @@ exports.play = {
             } else {
                 stream = request.get(arg);
             }
-            playStream(bot, msg, stream);
+            playStream(bot, msg, stream, arg);
         } else {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
             request(searchURL, function (error, response) {
@@ -82,6 +82,7 @@ exports.play = {
 
                 var video = videos[0];
                 var stream = ytdl('https://youtube.com/watch?v=' + video.id.videoId, { filter: 'audioonly', quality: 'highest' });
+                bot.sendMessage(msg.channel, 'https://youtube.com/watch?v=' + video.id.videoId);
                 playStream(bot, msg, stream);
             });
         }

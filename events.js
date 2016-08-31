@@ -88,7 +88,12 @@ module.exports = {
                 var whitespace = cmd.indexOf(' ');
                 if (whitespace === -1) whitespace = cmd.length;
 
-                if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
+                try {
+                    if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
+                } catch (e) {
+                    console.log(tools.getTimestamp() + ' Error executing command:');
+                    console.log(e.stack.replace(/\s\s\s\s/g, '\r\n    '));
+                }
             }
 
             // check flags
