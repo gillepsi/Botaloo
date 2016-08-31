@@ -1,22 +1,9 @@
 "use strict";
 const fs = require('fs');
 
+const events = require('../events.js');
 const tools = require('../tools.js');
 const config = require('../config.json');
-
-var muted = {};
-
-exports.getMuted = function () {
-    return muted;
-}
-
-exports.setMuted = function (input) {
-    muted = input;
-}
-
-exports.updateMuted = function (server) {
-    fs.writeFile(config.serverDir + server.id + '/muted.json', JSON.stringify(muted[server.id], null, 2), null);
-}
 
 exports.commands = [
     'mute',
@@ -24,7 +11,6 @@ exports.commands = [
 ]
 
 exports.events = [
-    'ready',
     'message'
 ]
 
@@ -42,21 +28,21 @@ exports.mute = {
 
         if (!user) return bot.sendMessage(msg.channel, 'User not found :cry:');
 
-        var list = exports.getMuted();
-        if (list[msg.server.id][user.id]) {
-            delete list[msg.server.id][user.id];
-            exports.setMuted(list);
-            exports.updateMuted(msg.server);
-            bot.sendMessage(msg.channel, 'Unmuted ' + user.username + ' :ok_hand:');
+        var users = events.getUsers();
+        if (users[msg.server.id][user.id].hasOwnProperty('muted')) {
+            if (users[msg.server.id][user.id]['muted'] == true) {
+                users[msg.server.id][user.id]['muted'] = false;
+                bot.sendMessage(msg.channel, 'Unmuted ' + user.username + ' :ok_hand:');
+            } else {
+                users[msg.server.id][user.id]['muted'] = true;
+                bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
+            }
         } else {
-            list[msg.server.id][user.id] = {
-                id: user.id,
-                username: user.username
-            };
-            exports.setMuted(list);
-            exports.updateMuted(msg.server);
+            users[msg.server.id][user.id] = {};
+            users[msg.server.id][user.id]['muted'] = true;
             bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
         }
+        events.updateUsers(msg.server.id, users);
     }
 }
 
@@ -76,34 +62,20 @@ exports.clear = {
     }
 }
 
-exports.ready = function (bot) {
-    for (var i = 0; i < bot.servers.length; i++) {
-        var server = bot.servers[i];
-        try {
-            var list = exports.getMuted();
-            list[server.id] = require(config.serverDir + server.id + '/muted.json');
-            exports.setMuted(list);
-        } catch (error) {
-            var list = exports.getMuted();
-            list[server.id] = {};
-            exports.setMuted(list);
-        }
-    }
-}
-
 exports.message = function (bot, message) {
     if (!message.server) return;
-    if (exports.getMuted()[message.server.id][message.author.id]) {
-        message.delete(function (error) {
-            bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
-        });
-    }
+    var users = events.getUsers();
+    if (users[message.server.id][message.author.id].hasOwnProperty('muted')) {
+        if (users[message.server.id][message.author.id]['muted'] == true) {
+            message.delete(function (error) {
+                bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
+            });
+            if (message.author.id === bot.user.id) users[message.server.id][bot.user.id]['muted'] = false;
+        }
+    } else users[message.server.id][message.author.id]['muted'] = false;
 
-    if (exports.getMuted()[message.server.id][bot.user.id]) {
-        var list = exports.getMuted();
-        delete list[message.server.id][bot.user.id];
-        exports.setMuted(list);
-    }
+    
+    events.updateUsers(message.server.id, users);
 }
 
 exports.m = {
@@ -111,11 +83,13 @@ exports.m = {
     description: 'bot will not send a response',
     process: function (bot, msg, arg) {
         if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
-        var list = exports.getMuted();
-        list[msg.server.id][bot.user.id] = {
-            id: bot.user.id,
-            username: bot.user.username
-        };
-        exports.setMuted(list);
+        var users = events.getUsers();
+        try {
+            users[msg.server.id][bot.user.id]['muted'] = true;
+        } catch (error) {
+            users[msg.server.id][bot.user.id] = {};
+            users[msg.server.id][bot.user.id]['muted'] = true;
+        }
+        events.updateUsers(msg.server.id, users);
     }
 }

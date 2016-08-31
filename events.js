@@ -49,6 +49,8 @@ var commands = {
     }
 };
 
+var users = {}
+
 module.exports = {
     addCommand: function (name, object) {
         commands[name] = object;
@@ -62,8 +64,25 @@ module.exports = {
         flags[name] = object;
     },
 
+    updateUsers: function (id, users) {
+        fs.writeFile(config.serverDir + id + config.playerFile, JSON.stringify(users[id], null, 2), null);
+    },
+
+    getUsers: function () {
+        return users;
+    },
+
+    setUsers: function (input) {
+        users = input;
+    },
+
     message: function (message) {
         var bot = main.getBot();
+        if (!users[message.server.id].hasOwnProperty(message.author.id)) {
+            users[message.server.id][message.author.id] = {}
+            users[message.server.id][message.author.id]['username'] = message.author.username;
+        }
+
         for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message);
 
         var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase();
@@ -72,7 +91,7 @@ module.exports = {
             var cmd = message.content.substring(config.prefix.length);
             console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
-            if (cmd === '') bot.sendMessage(message.channel, 'That\'s me!');
+            if (cmd === '') return bot.sendMessage(message.channel, 'That\'s me!');
 
             // check flags
             for (var flag in flags) {
@@ -110,6 +129,12 @@ module.exports = {
             var server = bot.servers[i];
             console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
             if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id);
+            try {
+                users[bot.servers[i].id] = require(config.serverDir + server.id + config.playerFile);
+            } catch (error) {
+                users[bot.servers[i].id] = {};
+                module.exports.updateUsers(bot.servers[i].id, users);
+            }
         }
         bot.setPlayingGame(config.game);
     },

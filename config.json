@@ -5,5 +5,10 @@
     "logDir": "./logs/",
     "fileDir": "./files/",
     "serverDir": "./servers/",
-    "pluginDir": "./plugins/"
+    "pluginDir": "./plugins/",
+    "playerFile": "/players.json",
+    "experience": {
+        "min": "15",
+        "max": "25"
+    }
 }
