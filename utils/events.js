@@ -1,9 +1,9 @@
 "use strict";
 const fs = require('fs');
 
-const main = require('./bot.js');
+const main = require('../bot.js');
 const tools = require('./tools.js');
-const config = require('./config.json');
+const config = require('../config.json');
 
 var events = {
     'message': {},

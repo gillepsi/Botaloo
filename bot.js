@@ -3,8 +3,8 @@ const Discord = require('discord.js');
 const util = require('util');
 const fs = require('fs');
 
-const events = require('./events.js');
-const tools = require('./tools.js');
+const events = require('./utils/events.js');
+const tools = require('./utils/tools.js');
 const config = require('./config.json');
 const auth = require('./auth.json');
 

@@ -1,7 +1,7 @@
 "use strict";
 const fs = require('fs');
 
-const events = require('../events.js');
+const events = require('../utils/events.js');
 const config = require('../config.json');
 
 exports.commands = [
