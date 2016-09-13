@@ -7,6 +7,7 @@ const config = require('../config.json');
 
 exports.commands = [
     'mute',
+    'disable',
     'clear'
 ]
 
@@ -46,6 +47,34 @@ exports.mute = {
     }
 }
 
+exports.disable = {
+    usage: '<username>',
+    description: 'disable a user from using this bot',
+    process: function (bot, msg, arg) {
+        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
+
+        var user = msg.channel.server.members.get('username', arg);
+
+        if (!user) return bot.sendMessage(msg.channel, 'User not found :cry:');
+
+        var users = events.getUsers();
+        if (users[msg.server.id][user.id].hasOwnProperty('disabled')) {
+            if (users[msg.server.id][user.id]['disabled'] == true) {
+                users[msg.server.id][user.id]['disabled'] = false;
+                bot.sendMessage(msg.channel, 'Enabled ' + user.username + ' :ok_hand:');
+            } else {
+                users[msg.server.id][user.id]['disabled'] = true;
+                bot.sendMessage(msg.channel, 'Disabled ' + user.username + ' :ok_hand:');
+            }
+        } else {
+            users[msg.server.id][user.id] = {};
+            users[msg.server.id][user.id]['disabled'] = true;
+            bot.sendMessage(msg.channel, 'Disabled ' + user.username + ' :ok_hand:');
+        }
+        events.updateUsers(msg.server.id, users);
+    }
+}
+
 exports.clear = {
     description: 'clear messages from current channel',
     usage: '<number>',
@@ -65,6 +94,7 @@ exports.clear = {
 exports.message = function (bot, message) {
     if (!message.server) return;
     var users = events.getUsers();
+    var val = undefined;
     if (users[message.server.id][message.author.id].hasOwnProperty('muted')) {
         if (users[message.server.id][message.author.id]['muted'] == true) {
             message.delete(function (error) {
@@ -74,8 +104,15 @@ exports.message = function (bot, message) {
         }
     } else users[message.server.id][message.author.id]['muted'] = false;
 
-    
+    if (users[message.server.id][message.author.id].hasOwnProperty('disabled')) {
+        if (users[message.server.id][message.author.id]['disabled'] == true) {
+            val = 'stop';
+            if (message.author.id === bot.user.id) users[message.server.id][bot.user.id]['disabled'] = false;
+        }
+    } else users[message.server.id][message.author.id]['disabled'] = false
+
     events.updateUsers(message.server.id, users);
+    return val;
 }
 
 exports.m = {

@@ -79,6 +79,7 @@ module.exports = {
     },
 
     message: function (message) {
+        var stop = false;
         var bot = main.getBot();
         if (message.server) { // if message is in a server
             if (!users[message.server.id].hasOwnProperty(message.author.id)) { // if user is not stored in array
@@ -87,7 +88,12 @@ module.exports = {
             }
         }
 
-        for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message); // call all message events added by plugins
+        for (var i = 0; i < Object.keys(events['message']).length; i++) {
+            var response = events['message'][i](bot, message); // call all message events added by plugins
+            if (response === 'stop') stop = true;
+        }
+
+        if (stop) return;
 
         var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase(); // get prefix from message and escape uppercase chars and whitespace
         if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase()) { // if prefix is in message
@@ -131,8 +137,9 @@ module.exports = {
             console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
             if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id);
             try {
-                users[bot.servers[i].id] = require(config.serverDir + server.id + config.playerFile);
+                users[bot.servers[i].id] = require('.' + config.serverDir + server.id + config.playerFile);
             } catch (error) {
+                console.log(tools.getTimestamp() + ' Error loading users:\n' + error);
                 users[bot.servers[i].id] = {};
                 module.exports.updateUsers(bot.servers[i].id, users);
             }
