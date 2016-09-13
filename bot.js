@@ -44,7 +44,7 @@ try {
     // event handlers
     bot.on('ready', events.ready);
     bot.on('disconnected', events.disconnected);
-    //bot.on('warn', events.warn);
+    bot.on('warn', events.warn);
     bot.on('error', events.error);
     bot.on('debug', events.debug);
     bot.on('message', events.message);
