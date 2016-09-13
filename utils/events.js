@@ -44,7 +44,9 @@ var commands = {
                 response += '\n-' + flag + ' - ' + desc;
             }
             response += '```';
-            bot.sendMessage(msg.channel, response);
+            bot.sendMessage(msg.channel, response, function(error) {
+                if (error) console.log(error);
+            });
         }
     }
 };
@@ -78,9 +80,11 @@ module.exports = {
 
     message: function (message) {
         var bot = main.getBot();
-        if (!users[message.server.id].hasOwnProperty(message.author.id)) {
-            users[message.server.id][message.author.id] = {}
-            users[message.server.id][message.author.id]['username'] = message.author.username;
+        if (message.server) {
+            if (!users[message.server.id].hasOwnProperty(message.author.id)) {
+                users[message.server.id][message.author.id] = {}
+                users[message.server.id][message.author.id]['username'] = message.author.username;
+            }
         }
 
         for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message);

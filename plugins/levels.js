@@ -28,6 +28,7 @@ exports.exp = {
 }
 
 exports.message = function (bot, message) {
+    if (!message.server) return;
     var users = events.getUsers();
     if (users[message.server.id][message.author.id].hasOwnProperty('experience')) {
         users[message.server.id][message.author.id]['experience'] += Math.floor(Math.random() * (config.experience.max - config.experience.min) + config.experience.min);
