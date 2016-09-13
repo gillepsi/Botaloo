@@ -80,25 +80,24 @@ module.exports = {
 
     message: function (message) {
         var bot = main.getBot();
-        if (message.server) {
-            if (!users[message.server.id].hasOwnProperty(message.author.id)) {
-                users[message.server.id][message.author.id] = {}
-                users[message.server.id][message.author.id]['username'] = message.author.username;
+        if (message.server) { // if message is in a server
+            if (!users[message.server.id].hasOwnProperty(message.author.id)) { // if user is not stored in array
+                users[message.server.id][message.author.id] = {} // add new object
+                users[message.server.id][message.author.id]['username'] = message.author.username; // populate object
             }
         }
 
-        for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message);
+        for (var i = 0; i < Object.keys(events['message']).length; i++) events['message'][i](bot, message); // call all message events added by plugins
 
-        var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase();
-        if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase()) {
-            for (flag in flags) flags[flag].bool = false;
-            var cmd = message.content.substring(config.prefix.length);
+        var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase(); // get prefix from message and escape uppercase chars and whitespace
+        if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase()) { // if prefix is in message
+            for (flag in flags) flags[flag].bool = false; // set all flags to false
+            var cmd = message.content.substring(config.prefix.length); // get cmd from message
             console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
             if (cmd === '') return bot.sendMessage(message.channel, 'That\'s me!');
 
-            // check flags
-            for (var flag in flags) {
+            for (var flag in flags) { // check flags
                 var flagpos = cmd.indexOf('-' + flag);
                 if (flagpos != -1) {
                     flags[flag].bool = true;
@@ -106,12 +105,11 @@ module.exports = {
                 }
             }
 
-            // check commands
-            for (var c in commands) {
+            for (var c in commands) { // check commands
                 var whitespace = cmd.indexOf(' ');
                 if (whitespace === -1) whitespace = cmd.length;
 
-                try {
+                try { // try execute command
                     if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
                 } catch (e) {
                     console.log(tools.getTimestamp() + ' Error executing command:');
@@ -119,8 +117,7 @@ module.exports = {
                 }
             }
 
-            // check flags
-            for (flag in flags) if (flags[flag].bool) flags[flag].process(main.getBot(), message, cmd);
+            for (flag in flags) if (flags[flag].bool) flags[flag].process(main.getBot(), message, cmd); // check flags
         }
     },
 
