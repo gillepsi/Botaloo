@@ -27,7 +27,6 @@ try {
     }
 
     // create directories if they don't exist
-    if (!fs.existsSync(config.fileDir)) fs.mkdirSync(config.fileDir);
     if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logdir);
     if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 
