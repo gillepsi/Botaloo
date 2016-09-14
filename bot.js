@@ -16,25 +16,22 @@ console.log = function (d) { // setup logging to the log directory
     log_stdout.write(util.format(d) + '\n');
 };
 
+// create directories if they don't exist
+if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logdir);
+if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
+
 try {
     const events = require('./utils/events.js');
 
     const bot = new Discord.Client({forceFetchUsers: true});
-
-    exports['getBot'] = function () {
-        return bot;
-    }
-
-    // create directories if they don't exist
-    if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logdir);
-    if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
+    exports['getBot'] = function () { return bot; }
 
     // load plugins
     fs.readdirSync(config.pluginDir).forEach(function (file) {
         var plugin = require(config.pluginDir + file);
-        for (var i = 0; i < plugin.commands.length; i++) events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);
-        for (var i = 0; i < plugin.events.length; i++) events.addEvent(plugin.events[i], plugin[plugin.events[i]]);
-        for (var i = 0; i < plugin.flags.length; i++) events.addFlag(plugin.flags[i], plugin[plugin.flags[i]]);
+        if (plugin.commands) for (var i = 0; i < plugin.commands.length; i++) events.addCommand(plugin.commands[i], plugin[plugin.commands[i]]);
+        if (plugin.events) for (var i = 0; i < plugin.events.length; i++) events.addEvent(plugin.events[i], plugin[plugin.events[i]]);
+        if (plugin.flags) for (var i = 0; i < plugin.flags.length; i++) events.addFlag(plugin.flags[i], plugin[plugin.flags[i]]);
     });
 
     // event handlers
