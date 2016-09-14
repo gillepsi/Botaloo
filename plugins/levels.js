@@ -4,22 +4,22 @@ const fs = require('fs');
 const events = require('../utils/events.js');
 const config = require('../config.json');
 
-exports.commands = [
+exports['commands'] = [
     'exp'
 ]
 
-exports.events = [
+exports['events'] = [
     'message'
 ]
 
-exports.flags = []
+exports['flags'] = []
 
 var convertExp = function (experience) {
     // todo
 }
 // todo: config.json per server defining levels
 
-exports.exp = {
+exports['exp'] = {
     description: 'bot will show your current exp',
     process: function (bot, msg, arg) {
         if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
@@ -27,7 +27,7 @@ exports.exp = {
     }
 }
 
-exports.message = function (bot, message) {
+exports['message'] = function (bot, message) {
     if (!message.server) return;
     var users = events.getUsers();
     if (users[message.server.id][message.author.id].hasOwnProperty('experience')) {
@@ -38,4 +38,3 @@ exports.message = function (bot, message) {
     events.updateUsers(message.server.id, users);
     // check if leveled
 }
-// yet to be implemented

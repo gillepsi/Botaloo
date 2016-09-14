@@ -4,7 +4,7 @@ const fs = require('fs');
 const tools = require('../utils/tools.js');
 const config = require('../config.json');
 
-exports.commands = [
+exports['commands'] = [
     'version',
     'pm',
     'say',
@@ -12,11 +12,11 @@ exports.commands = [
     'join-server'
 ]
 
-exports.events = []
+exports['events'] = []
 
-exports.flags = []
+exports['flags'] = []
 
-exports.version = {
+exports['version'] = {
     description: 'return the git commit this bot is running',
     process: function (bot, msg, arg) {
         var commit = require('child_process').spawn('git', ['log', '-n', '1']);
@@ -31,7 +31,7 @@ exports.version = {
     }
 }
 
-exports.pm = {
+exports['pm'] = {
     usage: '<username> <message>',
     description: 'private message a user',
     process: function (bot, msg, arg) {
@@ -63,7 +63,7 @@ exports.pm = {
     }
 }
 
-exports.say = {
+exports['say'] = {
     usage: '<message>',
     description: 'bot will repeat after you',
     process: function (bot, msg, arg) {
@@ -71,7 +71,7 @@ exports.say = {
     }
 }
 
-exports.eval = {
+exports['eval'] = {
     description: 'executes arbitrary javascript',
     usage: '<command>',
     process: function (bot, msg, arg) {
@@ -84,7 +84,7 @@ exports.eval = {
     }
 }
 
-exports.joinserver = {
+exports['join-server'] = {
     description: 'joins a server',
     usage: '<invite>',
     process: function (bot, msg, arg) {

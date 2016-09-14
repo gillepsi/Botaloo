@@ -5,21 +5,21 @@ const events = require('../utils/events.js');
 const tools = require('../utils/tools.js');
 const config = require('../config.json');
 
-exports.commands = [
+exports['commands'] = [
     'mute',
     'disable',
     'clear'
 ]
 
-exports.events = [
+exports['events'] = [
     'message'
 ]
 
-exports.flags = [
+exports['flags'] = [
     'm'
 ]
 
-exports.mute = {
+exports['mute'] = {
     description: 'mute a user',
     usage: '<username>',
     process: function (bot, msg, arg) {
@@ -47,7 +47,7 @@ exports.mute = {
     }
 }
 
-exports.disable = {
+exports['disable'] = {
     usage: '<username>',
     description: 'disable a user from using this bot',
     process: function (bot, msg, arg) {
@@ -75,7 +75,7 @@ exports.disable = {
     }
 }
 
-exports.clear = {
+exports['clear'] = {
     description: 'clear messages from current channel',
     usage: '<number>',
     process: function (bot, msg, arg) {
@@ -91,7 +91,7 @@ exports.clear = {
     }
 }
 
-exports.message = function (bot, message) {
+exports['message'] = function (bot, message) {
     if (!message.server) return;
     var users = events.getUsers();
     var val = undefined;
@@ -115,7 +115,7 @@ exports.message = function (bot, message) {
     return val;
 }
 
-exports.m = {
+exports['m'] = {
     bool: false,
     description: 'bot will not send a response',
     process: function (bot, msg, arg) {

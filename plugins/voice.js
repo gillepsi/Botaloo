@@ -6,7 +6,7 @@ const ytdl = require('ytdl-core');
 const config = require('../config.json');
 const ytAPIKey = require('../auth.json').youtube_api_key;
 
-exports.commands = [
+exports['commands'] = [
     'join',
     'leave',
     'play',
@@ -16,11 +16,11 @@ exports.commands = [
     'stop'
 ]
 
-exports.events = []
+exports['events'] = []
 
-exports.flags = []
+exports['flags'] = []
 
-exports.join = {
+exports['join'] = {
     description: 'joins your voice channel',
     process: function (bot, msg, arg) {
         bot.joinVoiceChannel(msg.author.voiceChannel, function (error, connection) {
@@ -29,7 +29,7 @@ exports.join = {
     }
 }
 
-exports.leave = {
+exports['leave'] = {
     description: 'leaves current voice channel',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
@@ -37,7 +37,7 @@ exports.leave = {
     }
 }
 
-exports.play = {
+exports['play'] = {
     description: 'play a youtube video',
     usage: '<url/title>',
     process: function (bot, msg, arg) {
@@ -89,7 +89,7 @@ exports.play = {
     }
 }
 
-exports.volume = {
+exports['volume'] = {
     description: 'set the volume',
     usage: '<number>',
     process: function (bot, msg, arg) {
@@ -100,7 +100,7 @@ exports.volume = {
     }
 }
 
-exports.pause = {
+exports['pause'] = {
     description: 'pause playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
@@ -109,7 +109,7 @@ exports.pause = {
     }
 }
 
-exports.resume = {
+exports['resume'] = {
     description: 'resume playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
@@ -118,7 +118,7 @@ exports.resume = {
     }
 }
 
-exports.stop = {
+exports['stop'] = {
     description: 'stop playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
