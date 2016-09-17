@@ -37,8 +37,8 @@ Another chat bot for Discord using [discord.js] (https://github.com/hydrabolt/di
 2. Create auth.json with the following format:
 
         {
-            "youtube\_api\_key": "INSERT\_HERE",
-            "discord\_token": "INSERT\_HERE"
+            "youtube_api_key": "INSERT_HERE",
+            "discord_token": "INSERT_HERE"
         }
 3. `npm install`
 4. `node bot.js`
