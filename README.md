@@ -1,5 +1,5 @@
 # Botaloo
-Anoter chat bot for Discord using [discord.js] (https://github.com/hydrabolt/discord.js/)
+Another chat bot for Discord using [discord.js] (https://github.com/hydrabolt/discord.js/)
 
 ## How to use
 1. `git clone https://github.com/slypher/botaloo.git`
