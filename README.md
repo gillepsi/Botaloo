@@ -25,7 +25,7 @@ Another chat bot for Discord using [discord.js] (https://github.com/hydrabolt/di
 - `disable <username>` Disallow a user from using this bot
 - `clear <number>` Clear the specified number of messages from current channel
 
-#### Levels #### - work in progress  
+#### Levels - work in progress  
 - `exp` Returns your current experience
 
 ### Command flags
