@@ -30,8 +30,8 @@ Levels are currently a work in progress
 - `exp` Returns your current experience
 
 ### Command flags
-`-d` Deletes the message containing your commands
-`-m` Deletes any following response from the bot
+- `-d` Deletes the message containing your commands
+- `-m` Deletes any following response from the bot
 
 ## How to use
 1. `git clone https://github.com/slypher/botaloo.git`
