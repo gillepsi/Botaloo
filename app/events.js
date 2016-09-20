@@ -5,7 +5,7 @@ const main = require('../bot.js');
 const tools = require('./tools.js');
 const config = require('../config.json');
 
-exports.eventList =  [
+exports.eventList = [
     'channelCreate',
     'channelDelete',
     'channelPinsUpdate',
