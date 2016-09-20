@@ -44,8 +44,6 @@ exports.eventList =  [
 
 var events = {}
 
-for (var event in module.exports.eventList) events[module.exports.eventList[event]] = {};
-
 var flags = {
     'd': {
         bool: false,
@@ -85,32 +83,23 @@ var commands = {
 
 var users = {}
 
-exports['addCommand'] = function (name, object) {
-    commands[name] = object;
-}
+// add all events from eventList as objects to events variable
+for (var event in module.exports.eventList) events[module.exports.eventList[event]] = {};
 
-exports['addEvent'] = function (event, process) {
-    events[event][Object.keys(events[event]).length] = process;
-}
+// functions used by bot.js to add plugin features
+exports['addCommand'] = function (name, object) { commands[name] = object; }
+exports['addEvent'] = function (event, process) { events[event][Object.keys(events[event]).length] = process; }
+exports['addFlag'] = function (name, object) { flags[name] = object; }
 
-exports['addFlag'] = function (name, object) {
-    flags[name] = object;
-}
+// functions used to manage the users array
+exports['updateUsers'] = function (id, users) { fs.writeFile(config.serverDir + id + config.playerFile, JSON.stringify(users[id], null, 2), null); }
+exports['getUsers'] = function () { return users; }
+exports['setUsers'] = function (input) { users = input; }
 
-exports['updateUsers'] = function (id, users) {
-    fs.writeFile(config.serverDir + id + config.playerFile, JSON.stringify(users[id], null, 2), null);
-}
-
-exports['getUsers'] = function () {
-    return users;
-}
-
-exports['setUsers'] = function (input) {
-    users = input;
-}
+// ----- start default event handlers -----
 
 exports['message'] = function (message) {
-    var stop = false;
+    var stop = false; // TODO: move to plugin responses object
     var bot = main.getBot();
     if (message.server) { // add user to storage
         if (!users[message.server.id].hasOwnProperty(message.author.id)) { // if user is not stored
@@ -119,12 +108,12 @@ exports['message'] = function (message) {
         }
     }
 
-    for (var i = 0; i < Object.keys(events['message']).length; i++) { // call all message events added by plugins
-        var response = events['message'][i](bot, message);
-        if (response === 'stop') stop = true;
+    for (var i = 0; i < Object.keys(events['message']).length; i++) { // call events added by plugins
+        var response = events['message'][i](bot, message); // get response from plugin event
+        if (response === 'stop') stop = true; // stop response
     }
 
-    if (stop) return;
+    if (stop) return; // 'stop' response stops further execution of this event
 
     var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase(); // get prefix from message and escape uppercase chars and whitespace
     if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase()) { // if prefix is in message
@@ -132,7 +121,7 @@ exports['message'] = function (message) {
         var cmd = message.content.substring(config.prefix.length); // get cmd from message
         console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
-        if (cmd === '') return bot.sendMessage(message.channel, 'That\'s me!');
+        if (cmd === '') return bot.sendMessage(message.channel, 'That\'s me!'); // default response
 
         for (var flag in flags) { // check flags
             var flagpos = cmd.indexOf('-' + flag);
@@ -160,16 +149,16 @@ exports['message'] = function (message) {
 
 exports['ready'] = function () {
     var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['ready']).length; i++) events['ready'][i](bot);
+    for (var i = 0; i < Object.keys(events['ready']).length; i++) events['ready'][i](bot); // call events added by plugins
 
     console.log(tools.getTimestamp() + ' Ready to begin');
-    for (var i = 0; i < bot.servers.length; i++) {
+    for (var i = 0; i < bot.servers.length; i++) { // for each server
         var server = bot.servers[i];
         console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
-        if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id);
-        try {
+        if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id); // create server directory
+        try { // attempt to load server users
             users[bot.servers[i].id] = require('.' + config.serverDir + server.id + config.playerFile);
-        } catch (error) {
+        } catch (error) { // create fresh server user file
             console.log(tools.getTimestamp() + ' Error loading users:\n' + error);
             users[bot.servers[i].id] = {};
             module.exports.updateUsers(bot.servers[i].id, users);
@@ -180,24 +169,24 @@ exports['ready'] = function () {
 
 exports['disconnected'] = function (m) {
     var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['disconnected']).length; i++) events['disconnected'][i](bot, m);
+    for (var i = 0; i < Object.keys(events['disconnected']).length; i++) events['disconnected'][i](bot, m); // call events added by plugins
     console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
 }
 
 exports['warn'] = function (m) {
     var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['warn']).length; i++) events['warn'][i](bot, m);
+    for (var i = 0; i < Object.keys(events['warn']).length; i++) events['warn'][i](bot, m); // call events added by plugins
     console.log(tools.getTimestamp() + ' [Warning] ' + m);
 }
 
 exports['error'] = function (m) {
     var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['error']).length; i++) events['error'][i](bot, m);
+    for (var i = 0; i < Object.keys(events['error']).length; i++) events['error'][i](bot, m); // call events added by plugins
     console.log(tools.getTimestamp() + ' [Error] ' + m);
 }
 
 exports['debug'] = function (m) {
     var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['debug']).length; i++) events['debug'][i](bot, message);
+    for (var i = 0; i < Object.keys(events['debug']).length; i++) events['debug'][i](bot, message); // call events added by plugins
     console.log(tools.getTimestamp() + ' [Debug] ' + m);
 }
