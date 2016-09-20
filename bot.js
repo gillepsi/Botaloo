@@ -35,6 +35,7 @@ try {
     });
 
     // event handlers
+    // TODO: iterate through events.event_list
     bot.on('ready', events.ready);
     bot.on('disconnected', events.disconnected);
     bot.on('warn', events.warn);

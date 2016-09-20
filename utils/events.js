@@ -5,6 +5,46 @@ const main = require('../bot.js');
 const tools = require('./tools.js');
 const config = require('../config.json');
 
+exports.event_list =  [ // TODO: use this list
+    'channelCreate',
+    'channelDelete',
+    'channelPinsUpdate',
+    'channelUpdate',
+    'error',
+    'guildBanAdd',
+    'guildBanRemove',
+    'guildCreate',
+    'guildDelete',
+    'guildMemberAdd',
+    'guildMemberAvailable',
+    'guildMemberRemove',
+    'guildMembersChunk',
+    'guildMemberSpeaking',
+    'guildMemberUpdate',
+    'guildRoleCreate',
+    'guildRoleDelete',
+    'guildRoleUpdate',
+    'guildUnavailable',
+    'guildUpdate',
+    'message',
+    'messageDelete',
+    'messageDeleteBulk',
+    'messageUpdate',
+    'presenceUpdate',
+    'ready',
+    'reconnecting',
+    'typingStart',
+    'typingStop',
+    'userUpdate',
+    'voiceStateUpdate'
+]
+
+var events = {}
+
+for (var event in module.exports.event_list) {
+    events[event] = {};
+}
+
 var events = {
     'message': {},
     'ready': {},
