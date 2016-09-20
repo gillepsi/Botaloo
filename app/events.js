@@ -5,11 +5,13 @@ const main = require('../bot.js');
 const tools = require('./tools.js');
 const config = require('../config.json');
 
-exports.event_list =  [ // TODO: use this list
+exports.eventList =  [
     'channelCreate',
     'channelDelete',
     'channelPinsUpdate',
     'channelUpdate',
+    'debug',
+    'disconnected',
     'error',
     'guildBanAdd',
     'guildBanRemove',
@@ -36,23 +38,13 @@ exports.event_list =  [ // TODO: use this list
     'typingStart',
     'typingStop',
     'userUpdate',
-    'voiceStateUpdate'
+    'voiceStateUpdate',
+    'warn'
 ]
 
 var events = {}
 
-for (var event in module.exports.event_list) {
-    events[event] = {};
-}
-
-var events = {
-    'message': {},
-    'ready': {},
-    'disconnected': {},
-    'warn': {},
-    'error': {},
-    'debug': {}
-}
+for (var event in module.exports.eventList) events[module.exports.eventList[event]] = {};
 
 var flags = {
     'd': {

@@ -7,18 +7,17 @@ const tools = require('./app/tools.js');
 const config = require('./config.json');
 const auth = require('./auth.json');
 
-const log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
-const log_stdout = process.stdout;
-const log_stderr = process.stderr;
-
-console.log = function (d) { // setup logging to the log directory
-    log_file.write(util.format(d) + '\r\n');
-    log_stdout.write(util.format(d) + '\n');
-};
-
 // create directories if they don't exist
 if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logdir);
 if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
+
+// setup logging to the log directory
+const log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
+
+console.log = function (d) {
+    log_file.write(util.format(d) + '\r\n');
+    process.stdout.write(util.format(d) + '\n');
+};
 
 try {
     const events = require('./app/events.js');
@@ -35,13 +34,7 @@ try {
     });
 
     // event handlers
-    // TODO: iterate through events.event_list
-    bot.on('ready', events.ready);
-    bot.on('disconnected', events.disconnected);
-    bot.on('warn', events.warn);
-    bot.on('error', events.error);
-    bot.on('debug', events.debug);
-    bot.on('message', events.message);
+    for (var event in events.eventList) if (events[events.eventList[event]]) bot.on(events.eventList[event], events[events.eventList[event]]);
 
     bot.loginWithToken(auth.discord_token);
 } catch (e) {
