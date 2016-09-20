@@ -1,7 +1,7 @@
 'use strict';
 const fs = require('fs');
 
-const tools = require('../utils/tools.js');
+const tools = require('../app/tools.js');
 const config = require('../config.json');
 
 exports['commands'] = [

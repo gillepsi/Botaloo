@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 const util = require('util');
 const fs = require('fs');
 
-const tools = require('./utils/tools.js');
+const tools = require('./app/tools.js');
 const config = require('./config.json');
 const auth = require('./auth.json');
 
@@ -21,7 +21,7 @@ if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logdir);
 if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 
 try {
-    const events = require('./utils/events.js');
+    const events = require('./app/events.js');
 
     const bot = new Discord.Client({forceFetchUsers: true});
     exports['getBot'] = function () { return bot; }
