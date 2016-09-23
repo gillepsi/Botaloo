@@ -134,6 +134,7 @@ exports['message'] = function (message) {
         for (var c in commands) { // check commands
             var whitespace = cmd.indexOf(' ');
             if (whitespace === -1) whitespace = cmd.length;
+            if (commands[c].server && message.server.id !== commands[c].server) continue;
 
             try { // try execute command
                 if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
