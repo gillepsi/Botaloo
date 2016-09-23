@@ -64,7 +64,7 @@ var commands = {
                 var usage = commands[c].usage + ' ';
 
                 if (usage === 'undefined ') usage = '';
-                response += '\n' + c + ' ' + usage + '- ' + desc;
+                if (!commands[c].server || msg.server.id === commands[c].server) response += '\n' + c + ' ' + usage + '- ' + desc;
             }
 
             response += '```\n Flags:```';
