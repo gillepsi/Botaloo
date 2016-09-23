@@ -72,10 +72,14 @@ exports['say'] = {
 }
 
 exports['eval'] = {
-    description: 'executes arbitrary javascript',
+    description: 'evaluate arbitrary javascript',
     usage: '<command>',
     process: function (bot, msg, arg) {
-        bot.sendMessage(msg.channel, '```' + eval(arg) + '```');
+        try {
+            bot.sendMessage(msg.channel, '```' + eval(arg) + '```');
+        } catch (e) {
+            bot.sendMessage(msg.channel, '```' + e + '```');
+        }
     }
 }
 

@@ -17,20 +17,26 @@ exports['lfg'] = {
     server: '191327605239054336',
     description: 'toggle the LFG group',
     process: function (bot, msg, arg) {
-        if (!msg.server) return;
+        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
         var role = msg.server.roles.get('name', 'Looking for Group');
         if (!role) return;
 
-        if (msg.author.hasRole(role)) msg.author.removeFrom(role);
-        else msg.author.addTo(role);
+        if (msg.author.hasRole(role)) {
+            msg.author.removeFrom(role);
+            bot.sendMessage(msg.channel, 'Removed from LFG :ok_hand:');
+        } else {
+            msg.author.addTo(role);
+            bot.sendMessage(msg.channel, 'Added to LFG :ok_hand:');
+        }
     }
 }
 
 exports['exec'] = {
     server: '191327605239054336',
-    description: 'toggle the LFG group',
+    description: 'execute arbitrary javascript',
     process: function (bot, msg, arg) {
         var has_permission = msg.author.hasRole(msg.server.roles.get('name', 'Staff'));
         if (has_permission) eval(arg);
+        if (!has_permission) bot.sendMessage(msg.channel, 'Nope! :poop:');
     }
 }
