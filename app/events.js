@@ -29,11 +29,11 @@ exports.eventList = [
     'serverMemberRemoved',
     'serverMemberUpdated',
     'presence',
-    'userTypingStarted'
+    'userTypingStarted',
     'userTypingStopped',
     'userBanned',
     'userUnbanned',
-    'noteUpdated'
+    'noteUpdated',
     'voiceJoin',
     'voiceSwitch',
     'voiceLeave',
@@ -169,6 +169,18 @@ exports['ready'] = function () {
     bot.setPlayingGame(config.game);
 }
 
+exports['reconnecting'] = function (m) {
+    var bot = main.getBot();
+    for (var i = 0; i < Object.keys(events['reconnecting']).length; i++) events['reconnecting'][i](bot, m); // call events added by plugins
+    console.log(tools.getTimestamp() + ' [Reconnecting] ' + m);
+}
+
+exports['disconnected'] = function (m) {
+    var bot = main.getBot();
+    for (var i = 0; i < Object.keys(events['disconnected']).length; i++) events['disconnected'][i](bot, m); // call events added by plugins
+    console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
+}
+
 exports['serverCreated'] = function (server) {
     var bot = main.getBot();
     for (var i = 0; i < Object.keys(events['serverCreated']).length; i++) events['serverCreated'][i](bot); // call events added by plugins'
@@ -182,12 +194,6 @@ exports['serverCreated'] = function (server) {
         users[server.id] = {};
         module.exports.updateUsers(server.id, users);
     }
-}
-
-exports['disconnected'] = function (m) {
-    var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['disconnected']).length; i++) events['disconnected'][i](bot, m); // call events added by plugins
-    console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
 }
 
 exports['warn'] = function (m) {
