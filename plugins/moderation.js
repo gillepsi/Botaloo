@@ -23,27 +23,27 @@ exports['mute'] = {
     description: 'mute a user',
     usage: '<username>',
     process: function (bot, msg, arg) {
-        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
 
-        var user = msg.channel.server.members.get('username', arg);
+        var user = tools.findUserByName(msg, arg)[0];
 
-        if (!user) return bot.sendMessage(msg.channel, 'User not found :cry:');
+        if (!user) return msg.channel.sendMessage('User not found :cry:');
 
         var users = events.getUsers();
-        if (users[msg.server.id][user.id].hasOwnProperty('muted')) {
-            if (users[msg.server.id][user.id]['muted'] == true) {
-                users[msg.server.id][user.id]['muted'] = false;
-                bot.sendMessage(msg.channel, 'Unmuted ' + user.username + ' :ok_hand:');
+        if (users[msg.guild.id][user.id].hasOwnProperty('muted')) {
+            if (users[msg.guild.id][user.id]['muted'] == true) {
+                users[msg.guild.id][user.id]['muted'] = false;
+                msg.channel.sendMessage('Unmuted ' + user.user.username + ' :ok_hand:');
             } else {
-                users[msg.server.id][user.id]['muted'] = true;
-                bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
+                users[msg.guild.id][user.id]['muted'] = true;
+                msg.channel.sendMessage('Muted ' + user.user.username + ' :ok_hand:');
             }
         } else {
-            users[msg.server.id][user.id] = {};
-            users[msg.server.id][user.id]['muted'] = true;
-            bot.sendMessage(msg.channel, 'Muted ' + user.username + ' :ok_hand:');
+            users[msg.guild.id][user.id] = {};
+            users[msg.guild.id][user.id]['muted'] = true;
+            msg.channel.sendMessage('Muted ' + user.user.username + ' :ok_hand:');
         }
-        events.updateUsers(msg.server.id, users);
+        events.updateUsers(msg.guild.id, users);
     }
 }
 
@@ -51,27 +51,27 @@ exports['disable'] = {
     usage: '<username>',
     description: 'disable a user from using this bot',
     process: function (bot, msg, arg) {
-        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
 
-        var user = msg.channel.server.members.get('username', arg);
+        var user = tools.findUserByName(msg, arg)[0];
 
-        if (!user) return bot.sendMessage(msg.channel, 'User not found :cry:');
+        if (!user) return msg.channel.sendMessage('User not found :cry:');
 
         var users = events.getUsers();
-        if (users[msg.server.id][user.id].hasOwnProperty('disabled')) {
-            if (users[msg.server.id][user.id]['disabled'] == true) {
-                users[msg.server.id][user.id]['disabled'] = false;
-                bot.sendMessage(msg.channel, 'Enabled ' + user.username + ' :ok_hand:');
+        if (users[msg.guild.id][user.id].hasOwnProperty('disabled')) {
+            if (users[msg.guild.id][user.id]['disabled'] == true) {
+                users[msg.guild.id][user.id]['disabled'] = false;
+                msg.channel.sendMessage('Enabled ' + user.user.username + ' :ok_hand:');
             } else {
-                users[msg.server.id][user.id]['disabled'] = true;
-                bot.sendMessage(msg.channel, 'Disabled ' + user.username + ' :ok_hand:');
+                users[msg.guild.id][user.id]['disabled'] = true;
+                msg.channel.sendMessage('Disabled ' + user.user.username + ' :ok_hand:');
             }
         } else {
-            users[msg.server.id][user.id] = {};
-            users[msg.server.id][user.id]['disabled'] = true;
-            bot.sendMessage(msg.channel, 'Disabled ' + user.username + ' :ok_hand:');
+            users[msg.guild.id][user.id] = {};
+            users[msg.guild.id][user.id]['disabled'] = true;
+            msg.channel.sendMessage('Disabled ' + user.user.username + ' :ok_hand:');
         }
-        events.updateUsers(msg.server.id, users);
+        events.updateUsers(msg.guild.id, users);
     }
 }
 
@@ -79,39 +79,47 @@ exports['clear'] = {
     description: 'clear messages from current channel',
     usage: '<number>',
     process: function (bot, msg, arg) {
-        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
-        if (arg > 100) return bot.sendMessage(msg.channel, 'Nope! :poop:');
-        msg.channel.getLogs((arg != '' ? arg = parseInt(arg) + 1 : arg = '2'), function (error, messages) {
-            if (error) return bot.sendMessage(msg.channel, 'Error getting logs :cry:');
-            bot.deleteMessages(messages, function (error) {
-                if (error) return bot.sendMessage(msg.channel, 'Error deleting messages :cry:');
-                bot.sendMessage(msg.channel, 'Deleted ' + messages.length - 1 + ' messages :ok_hand:');
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        if (arg > 100) return msg.channel.sendMessage('Nope! :poop:');
+        if (arg === '') arg = '2';
+        msg.channel.fetchMessages({ limit: arg })
+            .then(function (messages) {
+                for (var i = 0; i < messages.size; i++) {
+                    var message = messages.array()[i];
+                    message.delete()
+                        .catch(function (e) {
+                            msg.channel.sendMessage('Error deleting message :cry:');
+                        });
+                }
+                msg.channel.sendMessage('Deleted ' + (messages.size - 1) + ' messages :ok_hand:');
+            })
+            .catch(function (error) {
+                msg.channel.sendMessage('Error getting logs :cry:');
             });
-        });
     }
 }
 
 exports['message'] = function (bot, message) {
-    if (!message.server) return;
+    if (!message.guild) return;
     var users = events.getUsers();
     var val = undefined;
-    if (users[message.server.id][message.author.id].hasOwnProperty('muted')) {
-        if (users[message.server.id][message.author.id]['muted'] == true) {
+    if (users[message.guild.id][message.author.id].hasOwnProperty('muted')) {
+        if (users[message.guild.id][message.author.id]['muted'] == true) {
             message.delete(function (error) {
-                bot.sendMessage(msg.channel, 'Error deleting ' + message.author.username + '\'s message :cry:');
+                msg.channel.sendMessage('Error deleting ' + message.author.username + '\'s message :cry:');
             });
-            if (message.author.id === bot.user.id) users[message.server.id][bot.user.id]['muted'] = false;
+            if (message.author.id === bot.user.id) users[message.guild.id][bot.user.id]['muted'] = false;
         }
-    } else users[message.server.id][message.author.id]['muted'] = false;
+    } else users[message.guild.id][message.author.id]['muted'] = false;
 
-    if (users[message.server.id][message.author.id].hasOwnProperty('disabled')) {
-        if (users[message.server.id][message.author.id]['disabled'] == true) {
+    if (users[message.guild.id][message.author.id].hasOwnProperty('disabled')) {
+        if (users[message.guild.id][message.author.id]['disabled'] == true) {
             val = 'stop';
-            if (message.author.id === bot.user.id) users[message.server.id][bot.user.id]['disabled'] = false;
+            if (message.author.id === bot.user.id) users[message.guild.id][bot.user.id]['disabled'] = false;
         }
-    } else users[message.server.id][message.author.id]['disabled'] = false
+    } else users[message.guild.id][message.author.id]['disabled'] = false
 
-    events.updateUsers(message.server.id, users);
+    events.updateUsers(message.guild.id, users);
     return val;
 }
 
@@ -119,14 +127,14 @@ exports['m'] = {
     bool: false,
     description: 'bot will not send a response',
     process: function (bot, msg, arg) {
-        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
         var users = events.getUsers();
         try {
-            users[msg.server.id][bot.user.id]['muted'] = true;
+            users[msg.guild.id][bot.user.id]['muted'] = true;
         } catch (error) {
-            users[msg.server.id][bot.user.id] = {};
-            users[msg.server.id][bot.user.id]['muted'] = true;
+            users[msg.guild.id][bot.user.id] = {};
+            users[msg.guild.id][bot.user.id]['muted'] = true;
         }
-        events.updateUsers(msg.server.id, users);
+        events.updateUsers(msg.guild.id, users);
     }
 }

@@ -38,5 +38,19 @@ module.exports = { // used to escape bad characters in a command
         day = (day < 10 ? "0" : "") + day;
 
         return '[' + day + ':' + hour + ':' + min + ':' + sec + ']';
+    },
+
+    findUserByName: function (msg, suffix) {
+        return msg.channel.guild.members.filter((member) => member.user.username == suffix).array();
+    },
+
+    findUserById: function (msg, suffix) {
+        return msg.channel.guild.members.filter((member) => member.user.id == suffix).array();
+    },
+
+    getAuthorVoiceChannel: function (msg) {
+        var voiceChannelArray = msg.guild.channels.filter((v) => v.type == "voice").filter((v) => v.members.exists("id", msg.author.id)).array();
+        if (voiceChannelArray.length == 0) return null;
+        else return voiceChannelArray[0];
     }
 }

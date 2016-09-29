@@ -13,10 +13,10 @@
   "author": "Slypher",
   "license": "MIT",
   "dependencies": {
-    "child_process": "^1.0.2",
-    "discord.js": "^8.1.0",
-    "request": "^2.74.0",
-    "util": "^0.10.3",
-    "ytdl-core": "^0.7.17"
+    "child_process": "1.0.x",
+    "discord.js": "9.3.x",
+    "request": "2.75.x",
+    "util": "0.10.x",
+    "ytdl-core": "0.7.x"
   }
 }

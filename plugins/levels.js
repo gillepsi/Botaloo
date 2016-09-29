@@ -22,19 +22,19 @@ var convertExp = function (experience) {
 exports['exp'] = {
     description: 'bot will show your current exp',
     process: function (bot, msg, arg) {
-        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
-        bot.sendMessage(msg.channel, events.getUsers()[msg.server.id][msg.author.id]['experience']);
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        msg.channel.sendMessage(events.getUsers()[msg.guild.id][msg.author.id]['experience']);
     }
 }
 
 exports['message'] = function (bot, message) {
-    if (!message.server) return;
+    if (!message.guild) return;
     var users = events.getUsers();
-    if (users[message.server.id][message.author.id].hasOwnProperty('experience')) {
-        users[message.server.id][message.author.id]['experience'] += Math.floor(Math.random() * (config.experience.max - config.experience.min) + config.experience.min);
+    if (users[message.guild.id][message.author.id].hasOwnProperty('experience')) {
+        users[message.guild.id][message.author.id]['experience'] += Math.floor(Math.random() * (config.experience.max - config.experience.min) + config.experience.min);
     } else {
-        users[message.server.id][message.author.id]['experience'] = 0;
+        users[message.guild.id][message.author.id]['experience'] = 0;
     }
-    events.updateUsers(message.server.id, users);
+    events.updateUsers(message.guild.id, users);
     // check if leveled
 }

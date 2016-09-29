@@ -36,7 +36,7 @@ try {
     // event handlers
     for (var event in events.eventList) if (events[events.eventList[event]]) bot.on(events.eventList[event], events[events.eventList[event]]);
 
-    bot.loginWithToken(auth.discord_token);
+    bot.login(auth.discord_token);
 } catch (e) {
     console.log(e.stack.replace(/\s\s\s\s/g, '\r\n    '));
 }

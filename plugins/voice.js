@@ -3,6 +3,7 @@ const request = require('request');
 const fs = require('fs');
 const ytdl = require('ytdl-core');
 
+const tools = require('../app/tools.js');
 const config = require('../config.json');
 const ytAPIKey = require('../auth.json').youtube_api_key;
 
@@ -23,17 +24,22 @@ exports['flags'] = []
 exports['join'] = {
     description: 'joins your voice channel',
     process: function (bot, msg, arg) {
-        bot.joinVoiceChannel(msg.author.voiceChannel, function (error, connection) {
-            if (error) bot.sendMessage(msg.channel, 'Error joining voice channel :cry:');
-        });
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        
+        var voiceChannel = tools.getAuthorVoiceChannel(msg);
+        if (voiceChannel) voiceChannel.join();
+        else return msg.channel.sendMessage('You are not in a voice channel :confused:');
     }
 }
 
 exports['leave'] = {
     description: 'leaves current voice channel',
     process: function (bot, msg, arg) {
-        var connection = bot.voiceConnections.get('server', msg.server);
-        if (connection != null) connection.destroy();
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+
+        var connection = bot.voiceConnections.get(msg.guild.id);
+        if (connection != null) connection.channel.leave();
+        else return msg.channel.sendMessage('Not in a voice channel :confused:');
     }
 }
 
@@ -42,24 +48,23 @@ exports['play'] = {
     usage: '<url/title>',
     process: function (bot, msg, arg) {
         var playStream = function (bot, msg, stream) {
-            connection.playRawStream(stream, function (intent) {
-                if (connection.playing) bot.sendMessage(msg.channel, 'Now playing :ok_hand:');
+            connection.playStream(stream, function (intent) {
+                if (connection.playing) msg.channel.sendMessage('Now playing :ok_hand:');
                 intent.on('end', function () {
-                    bot.sendMessage(msg.channel, 'Finished playing :ok_hand:');
+                    msg.channel.sendMessage('Finished playing :ok_hand:');
                 });
 
                 intent.on('error', function () {
-                    bot.sendMessage(msg.channel, 'Error during playback :cry:');
+                    msg.channel.sendMessage('Error during playback :cry:');
                 });
             });
         }
 
-        var connection = bot.voiceConnections.get('server', msg.server);
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
 
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
+        var connection = bot.voiceConnections.get(msg.guild.id);
 
-        if (arg === '') if (connection.paused) return connection.resume();
-        if (connection.playing) return bot.sendMessage(msg.channel, 'Already playing :confused:');
+        if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
 
         if (arg.substring(0, 7).toLowerCase() === 'http://' || arg.substring(0, 8).toLowerCase() === 'https://') {
             var stream;
@@ -73,14 +78,14 @@ exports['play'] = {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
             request(searchURL, function (error, response) {
                 var payload = JSON.parse(response.body);
-                if (payload['items'].length == 0) return bot.sendMessage(msg.channel, 'Didn\'t find anything :cry:');
+                if (payload['items'].length == 0) return msg.channel.sendMessage('Didn\'t find anything :cry:');
 
                 var videos = payload.items.filter(item => item.id.kind === 'youtube#video');
-                if (videos.length === 0) return bot.sendMessage(msg.channel, 'Didn\'t find any video :cry:');
+                if (videos.length === 0) return msg.channel.sendMessage('Didn\'t find any video :cry:');
 
                 var video = videos[0];
                 var stream = ytdl('https://youtube.com/watch?v=' + video.id.videoId, { filter: 'audioonly', quality: 'highest' });
-                bot.sendMessage(msg.channel, 'https://youtube.com/watch?v=' + video.id.videoId);
+                msg.channel.sendMessage('https://youtube.com/watch?v=' + video.id.videoId);
                 playStream(bot, msg, stream);
             });
         }
@@ -91,36 +96,52 @@ exports['volume'] = {
     description: 'set the volume',
     usage: '<number>',
     process: function (bot, msg, arg) {
-        var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
 
-        if (arg) connection.setVolume(arg);
+        var connection = bot.voiceConnections.get(msg.guild.id);
+        if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
+
+        if (arg) {
+            if (connection.player.dispatcher) connection.player.dispatcher.setVolume(arg);
+            else return msg.channel.sendMessage('Nothing to set the volume of :confused:');
+        } else {
+            msg.channel.sendMessage('Provide a volume percent in decimal :confused:');
+        }
     }
 }
 
 exports['pause'] = {
     description: 'pause playing audio',
     process: function (bot, msg, arg) {
-        var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
-        if (connection.playing) connection.pause();
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        
+        var connection = bot.voiceConnections.get(msg.guild.id);
+        if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
+        if (connection.player.dispatcher) connection.player.dispatcher.pause();
+        else return msg.channel.sendMessage('Nothing to pause :confused:');
     }
 }
 
 exports['resume'] = {
     description: 'resume playing audio',
     process: function (bot, msg, arg) {
-        var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
-        if (connection.paused) connection.resume();
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        
+        var connection = bot.voiceConnections.get(msg.guild.id);
+        if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
+        if (connection.player.dispatcher) connection.player.dispatcher.resume();
+        else return msg.channel.sendMessage('Nothing to resume :confused:');
     }
 }
 
 exports['stop'] = {
     description: 'stop playing audio',
     process: function (bot, msg, arg) {
-        var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
-        if (connection.playing || connection.paused) connection.stopPlaying();
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        
+        var connection = bot.voiceConnections.get(msg.guild.id);
+        if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
+        if (connection.player.dispatcher) connection.player.dispatcher.end();
+        else return msg.channel.sendMessage('Nothing to stop :confused:');
     }
 }

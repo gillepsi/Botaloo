@@ -6,11 +6,11 @@ const config = require('../config.json');
 
 exports['commands'] = [
     'version',
+    'restart',
     'pm',
     'say',
     'eval',
-    'exec',
-    'join-server'
+    'exec'
 ]
 
 exports['events'] = []
@@ -23,11 +23,50 @@ exports['version'] = {
         var commit = require('child_process').spawn('git', ['log', '-n', '1']);
 
         commit.stdout.on('data', function (data) {
-            bot.sendMessage(msg.channel, data);
+            msg.channel.sendMessage(data);
         });
 
         commit.on('close', function (code) {
-            if (code != 0) bot.sendMessage(msg.channel, 'Failed checking git version :cry:');
+            if (code != 0) msg.channel.sendMessage('Failed checking git version :cry:');
+        });
+    }
+}
+
+exports['restart'] = {
+    user: '178482006320087042',
+    description: 'bot will perform a git pull and restart',
+    process: function (bot, msg, suffix) {
+        msg.channel.sendMessage('fetching updates...').then(function (sentMsg) {
+            console.log('updating...');
+            var spawn = require('child_process').spawn;
+            var log = function (err, stdout, stderr) {
+                if (stdout) { console.log(stdout); }
+                if (stderr) { console.log(stderr); }
+            };
+            var fetch = spawn('git', ['fetch']);
+            fetch.stdout.on('data', function (data) {
+                console.log(data.toString());
+            });
+            fetch.on('close', function (code) {
+                var reset = spawn('git', ['reset', '--hard', 'origin/master']);
+                reset.stdout.on('data', function (data) {
+                    console.log(data.toString());
+                });
+                reset.on('close', function (code) {
+                    var npm = spawn('npm', ['install']);
+                    npm.stdout.on('data', function (data) {
+                        console.log(data.toString());
+                    });
+                    npm.on('close', function (code) {
+                        console.log('goodbye');
+                        sentMsg.edit('brb!').then(function () {
+                            bot.destroy().then(function () {
+                                process.exit();
+                            });
+                        });
+                    });
+                });
+            });
         });
     }
 }
@@ -36,31 +75,19 @@ exports['pm'] = {
     usage: '<username> <message>',
     description: 'private message a user',
     process: function (bot, msg, arg) {
-        if (!msg.server) return bot.sendMessage(msg.channel, 'Nope! :poop:');
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
 
         var whitespace = arg.indexOf(' ');
-        var target = '';
-        target = arg.substring(0, whitespace);
-
+        var target = arg.substring(0, whitespace);
         var pm = arg.substring(whitespace + 1);
+
         if (pm == '') pm = 'Hello!';
+        if (target == '') return msg.channel.sendMessage('Supply a username.');
 
-        if (target == '') return bot.sendMessage(msg.channel, 'Supply a username.');
+        var user = tools.findUserByName(msg, target)[0];
 
-        var users = msg.channel.server.members.getAll('username', target);
-
-        if (users.length == 1) {
-            bot.sendMessage(users[0], pm);
-        } else if (users.length > 1) {
-            var response = 'multiple users found:';
-            for (var i = 0; i < users.length; i++) {
-                var user = users[i];
-                response += '\nThe id of ' + user.username + ' is ' + user.id;
-            }
-            bot.sendMessage(msg.channel, response);
-        } else {
-            bot.sendMessage(msg.channel, 'No user ' + target + ' found!');
-        }
+        if (!user) return msg.channel.sendMessage('No user ' + target + ' found!');
+        user.sendMessage(pm);
     }
 }
 
@@ -68,7 +95,7 @@ exports['say'] = {
     usage: '<message>',
     description: 'bot will repeat after you',
     process: function (bot, msg, arg) {
-        bot.sendMessage(msg.channel, arg);
+        msg.channel.sendMessage(arg);
     }
 }
 
@@ -78,9 +105,9 @@ exports['eval'] = {
     usage: '<command>',
     process: function (bot, msg, arg) {
         try {
-            bot.sendMessage(msg.channel, '```' + eval(arg) + '```');
+            msg.channel.sendMessage('```' + eval(arg) + '```');
         } catch (e) {
-            bot.sendMessage(msg.channel, '```' + e + '```');
+            msg.channel.sendMessage('```' + e + '```');
         }
     }
 }
@@ -90,21 +117,5 @@ exports['exec'] = {
     description: 'execute arbitrary javascript',
     process: function (bot, msg, arg) {
         eval(arg);
-    }
-}
-
-exports['join-server'] = {
-    description: 'joins a server',
-    usage: '<invite>',
-    process: function (bot, msg, arg) {
-        console.log(tools.getTimestamp() + ' ' + bot.joinServer(arg, function (error, server) {
-            console.log(tools.getTimestamp() + ' callback: ' + arguments);
-            if (error) {
-                bot.sendMessage(msg.channel, 'failed to join: ' + error);
-            } else {
-                console.log(tools.getTimestamp + ' Joined server ' + server);
-                bot.sendMessage(msg.channel, 'Successfully joined ' + server + ':ok_hand:');
-            }
-        }));
     }
 }

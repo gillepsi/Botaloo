@@ -63,7 +63,7 @@ var commands = {
                 var usage = commands[c].usage + ' ';
 
                 if (usage === 'undefined ') usage = '';
-                if (!commands[c].server || msg.server.id === commands[c].server) response += '\n' + c + ' ' + usage + '- ' + desc;
+                if (!commands[c].guild || msg.guild.id === commands[c].guild) response += '\n' + c + ' ' + usage + '- ' + desc;
             }
 
             response += '```\n Flags:```';
@@ -73,7 +73,7 @@ var commands = {
                 response += '\n-' + flag + ' - ' + desc;
             }
             response += '```';
-            bot.sendMessage(msg.author, response);
+            msg.author.sendMessage( response);
         }
     }
 };
@@ -98,10 +98,10 @@ exports['setUsers'] = function (input) { users = input; }
 exports['message'] = function (message) {
     var stop = false; // TODO: move to plugin responses object
     var bot = main.getBot();
-    if (message.server) { // add user to storage
-        if (!users[message.server.id].hasOwnProperty(message.author.id)) { // if user is not stored
-            users[message.server.id][message.author.id] = {} // add new user object
-            users[message.server.id][message.author.id]['username'] = message.author.username; // populate user object
+    if (message.guild) { // add user to storage
+        if (!users[message.guild.id].hasOwnProperty(message.author.id)) { // if user is not stored
+            users[message.guild.id][message.author.id] = {} // add new user object
+            users[message.guild.id][message.author.id]['username'] = message.author.username; // populate user object
         }
     }
 
@@ -118,7 +118,7 @@ exports['message'] = function (message) {
         var cmd = message.content.substring(config.prefix.length); // get cmd from message
         console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
-        if (cmd === '') return bot.sendMessage(message.channel, 'That\'s me!'); // default response
+        if (cmd === '') return message.channel.sendMessage('That\'s me!'); // default response
 
         for (var flag in flags) { // check flags
             var flagpos = cmd.indexOf('-' + flag);
@@ -131,11 +131,14 @@ exports['message'] = function (message) {
         for (var c in commands) { // check commands
             var whitespace = cmd.indexOf(' ');
             if (whitespace === -1) whitespace = cmd.length;
-            if (commands[c].server && message.server.id !== commands[c].server) continue
+            if (commands[c].guild && message.guild.id !== commands[c].guild) continue
             if (commands[c].user && message.author.id !== commands[c].user) continue
 
-            if (commands[c].role && !message.server.roles.get('id', commands[c].role)) continue
-            if (commands[c].role && message.server.roles.get('id', commands[c].role) && !message.author.hasRole(message.server.roles.get('id', commands[c].role))) continue
+            if (commands[c].role) {
+                if (!message.guild) continue;
+                if (!message.guild.roles.get('id', commands[c].role)) continue
+                if (!message.author.hasRole(message.guild.roles.get('id', commands[c].role))) continue
+            }
 
             try { // try execute command
                 if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
@@ -154,19 +157,19 @@ exports['ready'] = function () {
     for (var i = 0; i < Object.keys(events['ready']).length; i++) events['ready'][i](bot); // call events added by plugins
 
     console.log(tools.getTimestamp() + ' Ready to begin');
-    for (var i = 0; i < bot.servers.length; i++) { // for each server
-        var server = bot.servers[i];
-        console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
-        if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id); // create server directory
-        try { // attempt to load server users
-            users[bot.servers[i].id] = require('.' + config.serverDir + server.id + config.playerFile);
-        } catch (error) { // create fresh server user file
+    for (var i = 0; i < bot.guilds.size; i++) { // for each guild
+        var guild = bot.guilds.array()[i];
+        console.log(guild.name + ' (' + guild.id + ') - ' + guild.channels.length + ' channels');
+        if (!fs.existsSync(config.serverDir + guild.id)) fs.mkdirSync(config.serverDir + guild.id); // create guild directory
+        try { // attempt to load guild users
+            users[guild.id] = require('.' + config.serverDir + guild.id + config.playerFile);
+        } catch (error) { // create fresh guild user file
             console.log(tools.getTimestamp() + ' Error loading users:\n' + error);
-            users[bot.servers[i].id] = {};
-            module.exports.updateUsers(bot.servers[i].id, users);
+            users[guild.id] = {};
+            module.exports.updateUsers(guild.id, users);
         }
     }
-    bot.setPlayingGame(config.game);
+    bot.user.setStatus('online', config.game);
 }
 
 exports['reconnecting'] = function (m) {
@@ -181,18 +184,18 @@ exports['disconnected'] = function (m) {
     console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
 }
 
-exports['serverCreated'] = function (server) {
+exports['serverCreated'] = function (guild) {
     var bot = main.getBot();
     for (var i = 0; i < Object.keys(events['serverCreated']).length; i++) events['serverCreated'][i](bot); // call events added by plugins'
 
-    console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
-    if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id); // create server directory
+    console.log(guild.name + ' (' + guild.id + ') - ' + guild.channels.length + ' channels');
+    if (!fs.existsSync(config.serverDir + guild.id)) fs.mkdirSync(config.serverDir + guild.id); // create server directory
     try { // attempt to load server users
-        users[server.id] = require('.' + config.serverDir + server.id + config.playerFile);
+        users[guild.id] = require('.' + config.serverDir + guild.id + config.playerFile);
     } catch (error) { // create fresh server user file
         console.log(tools.getTimestamp() + ' Error loading users:\n' + error);
-        users[server.id] = {};
-        module.exports.updateUsers(server.id, users);
+        users[guild.id] = {};
+        module.exports.updateUsers(guild.id, users);
     }
 }
 
