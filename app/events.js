@@ -6,40 +6,39 @@ const tools = require('./tools.js');
 const config = require('../config.json');
 
 exports.eventList = [
-    'channelCreate',
-    'channelDelete',
-    'channelPinsUpdate',
-    'channelUpdate',
+    'raw',
     'debug',
-    'disconnected',
+    'warn',
     'error',
-    'guildBanAdd',
-    'guildBanRemove',
-    'guildCreate',
-    'guildDelete',
-    'guildMemberAdd',
-    'guildMemberAvailable',
-    'guildMemberRemove',
-    'guildMembersChunk',
-    'guildMemberSpeaking',
-    'guildMemberUpdate',
-    'guildRoleCreate',
-    'guildRoleDelete',
-    'guildRoleUpdate',
-    'guildUnavailable',
-    'guildUpdate',
-    'message',
-    'messageDelete',
-    'messageDeleteBulk',
-    'messageUpdate',
-    'presenceUpdate',
     'ready',
     'reconnecting',
-    'typingStart',
-    'typingStop',
-    'userUpdate',
+    'disconnected',
+    'serverCreated',
+    'serverDeleted',
+    'message',
+    'messageDeleted',
+    'messageUpdated',
+    'channelCreated',
+    'channelDeleted',
+    'channelPinsUpdate',
+    'channelUpdated',
+    'serverRoleCreated',
+    'serverRoleDeleted',
+    'serverRoleUpdated',
+    'serverNewMember',
+    'serverMemberRemoved',
+    'serverMemberUpdated',
+    'presence',
+    'userTypingStarted'
+    'userTypingStopped',
+    'userBanned',
+    'userUnbanned',
+    'noteUpdated'
+    'voiceJoin',
+    'voiceSwitch',
+    'voiceLeave',
     'voiceStateUpdate',
-    'warn'
+    'voiceSpeaking'
 ]
 
 var events = {}
@@ -74,9 +73,7 @@ var commands = {
                 response += '\n-' + flag + ' - ' + desc;
             }
             response += '```';
-            bot.sendMessage(msg.channel, response, function (error) {
-                if (error) console.log(error);
-            });
+            bot.sendMessage(msg.author, response);
         }
     }
 };
@@ -134,7 +131,11 @@ exports['message'] = function (message) {
         for (var c in commands) { // check commands
             var whitespace = cmd.indexOf(' ');
             if (whitespace === -1) whitespace = cmd.length;
-            if (commands[c].server && message.server.id !== commands[c].server) continue;
+            if (commands[c].server && message.server.id !== commands[c].server) continue
+            if (commands[c].user && message.author.id !== commands[c].user) continue
+
+            if (commands[c].role && !message.server.roles.get('id', commands[c].role)) continue
+            if (commands[c].role && message.server.roles.get('id', commands[c].role) && !message.author.hasRole(message.server.roles.get('id', commands[c].role))) continue
 
             try { // try execute command
                 if (cmd.substring(0, whitespace).toLowerCase() === c) commands[c].process(bot, message, cmd.substring(c.length + 1, cmd.length));
@@ -166,6 +167,21 @@ exports['ready'] = function () {
         }
     }
     bot.setPlayingGame(config.game);
+}
+
+exports['serverCreated'] = function (server) {
+    var bot = main.getBot();
+    for (var i = 0; i < Object.keys(events['serverCreated']).length; i++) events['serverCreated'][i](bot); // call events added by plugins'
+
+    console.log(server.name + ' (' + server.id + ') - ' + server.channels.length + ' channels');
+    if (!fs.existsSync(config.serverDir + server.id)) fs.mkdirSync(config.serverDir + server.id); // create server directory
+    try { // attempt to load server users
+        users[server.id] = require('.' + config.serverDir + server.id + config.playerFile);
+    } catch (error) { // create fresh server user file
+        console.log(tools.getTimestamp() + ' Error loading users:\n' + error);
+        users[server.id] = {};
+        module.exports.updateUsers(server.id, users);
+    }
 }
 
 exports['disconnected'] = function (m) {
