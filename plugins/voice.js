@@ -56,12 +56,10 @@ exports['play'] = {
 
         var connection = bot.voiceConnections.get('server', msg.server);
 
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
 
-        if (arg === '') {
-            if (connection.paused) connection.resume();
-            return;
-        }
+        if (arg === '') if (connection.paused) return connection.resume();
+        if (connection.playing) return bot.sendMessage(msg.channel, 'Already playing :confused:');
 
         if (arg.substring(0, 7).toLowerCase() === 'http://' || arg.substring(0, 8).toLowerCase() === 'https://') {
             var stream;
@@ -94,7 +92,7 @@ exports['volume'] = {
     usage: '<number>',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
 
         if (arg) connection.setVolume(arg);
     }
@@ -104,7 +102,7 @@ exports['pause'] = {
     description: 'pause playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
         if (connection.playing) connection.pause();
     }
 }
@@ -113,7 +111,7 @@ exports['resume'] = {
     description: 'resume playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
         if (connection.paused) connection.resume();
     }
 }
@@ -122,7 +120,7 @@ exports['stop'] = {
     description: 'stop playing audio',
     process: function (bot, msg, arg) {
         var connection = bot.voiceConnections.get('server', msg.server);
-        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :cry:');
+        if (!connection) return bot.sendMessage(msg.channel, 'Not in a voice channel :confused:');
         if (connection.playing || connection.paused) connection.stopPlaying();
     }
 }
