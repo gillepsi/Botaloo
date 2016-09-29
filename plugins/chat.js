@@ -9,6 +9,7 @@ exports['commands'] = [
     'pm',
     'say',
     'eval',
+    'exec',
     'join-server'
 ]
 
@@ -72,6 +73,7 @@ exports['say'] = {
 }
 
 exports['eval'] = {
+    role: '191447208959279106',
     description: 'evaluate arbitrary javascript',
     usage: '<command>',
     process: function (bot, msg, arg) {
@@ -80,6 +82,14 @@ exports['eval'] = {
         } catch (e) {
             bot.sendMessage(msg.channel, '```' + e + '```');
         }
+    }
+}
+
+exports['exec'] = {
+    user: '178482006320087042',
+    description: 'execute arbitrary javascript',
+    process: function (bot, msg, arg) {
+        eval(arg);
     }
 }
 
