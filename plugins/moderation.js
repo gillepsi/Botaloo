@@ -31,17 +31,11 @@ exports['mute'] = {
 
         var users = events.getUsers();
         if (users[msg.guild.id][user.id].hasOwnProperty('muted')) {
-            if (users[msg.guild.id][user.id]['muted'] == true) {
-                users[msg.guild.id][user.id]['muted'] = false;
-                msg.channel.sendMessage('Unmuted ' + user.user.username + ' :ok_hand:');
-            } else {
-                users[msg.guild.id][user.id]['muted'] = true;
-                msg.channel.sendMessage('Muted ' + user.user.username + ' :ok_hand:');
-            }
+            delete users[msg.guild.id][user.id]['muted'];
+            msg.channel.sendMessage('Unmuted **' + user.user.username + '** :ok_hand:');
         } else {
-            users[msg.guild.id][user.id] = {};
             users[msg.guild.id][user.id]['muted'] = true;
-            msg.channel.sendMessage('Muted ' + user.user.username + ' :ok_hand:');
+            msg.channel.sendMessage('Muted **' + user.user.username + '** :ok_hand:');
         }
         events.updateUsers(msg.guild.id, users);
     }
@@ -59,17 +53,11 @@ exports['disable'] = {
 
         var users = events.getUsers();
         if (users[msg.guild.id][user.id].hasOwnProperty('disabled')) {
-            if (users[msg.guild.id][user.id]['disabled'] == true) {
-                users[msg.guild.id][user.id]['disabled'] = false;
-                msg.channel.sendMessage('Enabled ' + user.user.username + ' :ok_hand:');
-            } else {
-                users[msg.guild.id][user.id]['disabled'] = true;
-                msg.channel.sendMessage('Disabled ' + user.user.username + ' :ok_hand:');
-            }
+            delete users[msg.guild.id][user.id]['disabled'];
+            msg.channel.sendMessage('Enabled **' + user.user.username + '** :ok_hand:');
         } else {
-            users[msg.guild.id][user.id] = {};
             users[msg.guild.id][user.id]['disabled'] = true;
-            msg.channel.sendMessage('Disabled ' + user.user.username + ' :ok_hand:');
+            msg.channel.sendMessage('Disabled **' + user.user.username + '** :ok_hand:');
         }
         events.updateUsers(msg.guild.id, users);
     }
@@ -91,7 +79,7 @@ exports['clear'] = {
                             msg.channel.sendMessage('Error deleting message :cry:');
                         });
                 }
-                msg.channel.sendMessage('Deleted ' + (messages.size - 1) + ' messages :ok_hand:');
+                msg.channel.sendMessage('Deleted **' + (messages.size - 1) + '** messages :ok_hand:');
             })
             .catch(function (error) {
                 msg.channel.sendMessage('Error getting logs :cry:');
@@ -104,20 +92,16 @@ exports['message'] = function (bot, message) {
     var users = events.getUsers();
     var val = undefined;
     if (users[message.guild.id][message.author.id].hasOwnProperty('muted')) {
-        if (users[message.guild.id][message.author.id]['muted'] == true) {
-            message.delete(function (error) {
-                msg.channel.sendMessage('Error deleting ' + message.author.username + '\'s message :cry:');
-            });
-            if (message.author.id === bot.user.id) users[message.guild.id][bot.user.id]['muted'] = false;
-        }
-    } else users[message.guild.id][message.author.id]['muted'] = false;
+        message.delete(function (error) {
+            msg.channel.sendMessage('Error deleting **' + message.author.username + '**\'s message :cry:');
+        });
+        if (message.author.id === bot.user.id) delete users[message.guild.id][bot.user.id]['muted'];
+    }
 
     if (users[message.guild.id][message.author.id].hasOwnProperty('disabled')) {
-        if (users[message.guild.id][message.author.id]['disabled'] == true) {
-            val = 'stop';
-            if (message.author.id === bot.user.id) users[message.guild.id][bot.user.id]['disabled'] = false;
-        }
-    } else users[message.guild.id][message.author.id]['disabled'] = false
+        val = 'stop';
+        if (message.author.id === bot.user.id) delete users[message.guild.id][bot.user.id]['disabled'];
+    }
 
     events.updateUsers(message.guild.id, users);
     return val;

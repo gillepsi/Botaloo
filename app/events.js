@@ -97,6 +97,7 @@ exports['setUsers'] = function (input) { users = input; }
 
 exports['message'] = function (message) {
     var stop = false; // TODO: move to plugin responses object
+    var newPrefix = ''; // TODO: move to plugin responses object
     var bot = main.getBot();
     if (message.guild) { // add user to storage
         if (!users[message.guild.id].hasOwnProperty(message.author.id)) { // if user is not stored
@@ -108,14 +109,20 @@ exports['message'] = function (message) {
     for (var i = 0; i < Object.keys(events['message']).length; i++) { // call events added by plugins
         var response = events['message'][i](bot, message); // get response from plugin event
         if (response === 'stop') stop = true; // stop response
+        if (response === 'prefix') newPrefix = users[message.guild.id][message.author.id]['prefix']; // add a prefix
     }
 
     if (stop) return; // 'stop' response stops further execution of this event
 
     var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase(); // get prefix from message and escape uppercase chars and whitespace
-    if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase()) { // if prefix is in message
+    var msgNewPrefix = (newPrefix !== '' ? message.content.substring(0, newPrefix.length) : ' ') // get new prefix from message
+    if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase() || msgNewPrefix === newPrefix) { // if prefix is in message
         for (flag in flags) flags[flag].bool = false; // set all flags to false
-        var cmd = message.content.substring(config.prefix.length); // get cmd from message
+
+        var cmd_start = (msgNewPrefix === newPrefix ? newPrefix.length : config.prefix.length);
+        while (message.content[cmd_start] === ' ') cmd_start += 1;
+
+        var cmd = message.content.substring(cmd_start); // get cmd from message
         console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
 
         if (cmd === '') return message.channel.sendMessage('That\'s me!'); // default response
@@ -159,7 +166,7 @@ exports['ready'] = function () {
     console.log(tools.getTimestamp() + ' Ready to begin');
     for (var i = 0; i < bot.guilds.size; i++) { // for each guild
         var guild = bot.guilds.array()[i];
-        console.log(guild.name + ' (' + guild.id + ') - ' + guild.channels.length + ' channels');
+        console.log(guild.name + ' (' + guild.id + ') - ' + guild.channels.size + ' channels');
         if (!fs.existsSync(config.serverDir + guild.id)) fs.mkdirSync(config.serverDir + guild.id); // create guild directory
         try { // attempt to load guild users
             users[guild.id] = require('.' + config.serverDir + guild.id + config.playerFile);

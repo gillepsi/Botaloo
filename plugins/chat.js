@@ -2,6 +2,7 @@
 const fs = require('fs');
 
 const tools = require('../app/tools.js');
+const events = require('../app/events.js');
 const config = require('../config.json');
 
 exports['commands'] = [
@@ -9,11 +10,14 @@ exports['commands'] = [
     'restart',
     'pm',
     'say',
+    'prefix',
     'eval',
     'exec'
 ]
 
-exports['events'] = []
+exports['events'] = [
+    'message'
+]
 
 exports['flags'] = []
 
@@ -99,6 +103,19 @@ exports['say'] = {
     }
 }
 
+exports['prefix'] = {
+    usage: '<prefix>',
+    description: 'modify the additional prefix you use in this server to access this bot',
+    process: function (bot, msg, arg) {
+        if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+
+        var users = events.getUsers();
+        users[msg.guild.id][msg.author.id]['prefix'] = arg;
+        msg.channel.sendMessage('Changed your prefix to **' + arg + '** :ok_hand:');
+        events.updateUsers(msg.guild.id, users);
+    }
+}
+
 exports['eval'] = {
     role: '191447208959279106',
     description: 'evaluate arbitrary javascript',
@@ -118,4 +135,13 @@ exports['exec'] = {
     process: function (bot, msg, arg) {
         eval(arg);
     }
+}
+
+exports['message'] = function (bot, message) {
+    if (!message.guild) return;
+    var users = events.getUsers();
+    var val = undefined;
+    if (users[message.guild.id][message.author.id].hasOwnProperty('prefix')) val = 'prefix';
+
+    return val;
 }
