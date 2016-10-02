@@ -4,8 +4,10 @@ const fs = require('fs');
 const tools = require('../app/tools.js');
 const events = require('../app/events.js');
 const config = require('../config.json');
+const auth = require('../auth.json')
 
 exports['commands'] = [
+    'url',
     'version',
     'restart',
     'pm',
@@ -20,6 +22,13 @@ exports['events'] = [
 ]
 
 exports['flags'] = []
+
+exports['url'] = {
+    description: 'get the Bot invite URL',
+    process: function (bot, msg, arg) {
+        return msg.channel.sendMessage('https://discordapp.com/oauth2/authorize?client_id='+ auth.client_id + '&scope=bot');
+    }
+}
 
 exports['version'] = {
     description: 'return the git commit this bot is running',
