@@ -78,6 +78,9 @@ exports['restart'] = {
                             bot.destroy().then(function () {
                                 const nodeKeyword = which.sync('node');
                                 const node = spawn(nodeKeyword, ['./']);
+                                node.stdout.on('data', function(data) {
+                                    console.log(data.toString().replace('\n', '')); 
+                                });
                                 node.on('exit', function (code) {
                                     process.exit();
                                 });
