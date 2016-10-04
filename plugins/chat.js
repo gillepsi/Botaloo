@@ -60,13 +60,16 @@ exports['restart'] = {
             fetch.stdout.on('data', function (data) {
                 console.log(data.toString());
             });
+            fetch.on('error', function (error) { throw error; })
             fetch.on('close', function (code) {
                 var reset = spawn('git', ['reset', '--hard', 'origin/master']);
                 reset.stdout.on('data', function (data) {
                     console.log(data.toString());
                 });
+                reset.on('error', function (error) { throw error; });
                 reset.on('close', function (code) {
                     var npm = spawn('npm', ['install']);
+                    npm.on('error', function ( error ) { throw error; });
                     npm.stdout.on('data', function (data) {
                         console.log(data.toString());
                     });
