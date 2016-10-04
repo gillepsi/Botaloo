@@ -6,39 +6,37 @@ const tools = require('./tools.js');
 const config = require('../config.json');
 
 exports.eventList = [
-    'raw',
-    'debug',
-    'warn',
+    'channelCreate',
+    'channelDelete',
+    'channelPinsUpdate',
+    'channelUpdate',
     'error',
+    'guildBanAdd',
+    'guildBanRemove',
+    'guildCreate',
+    'guildDelete',
+    'guildMemberAdd',
+    'guildMemberAvailable',
+    'guildMemberRemove',
+    'guildMembersChunk',
+    'guildMemberSpeaking',
+    'guildMemberUpdate',
+    'guildRoleCreate',
+    'guildRoleDelete',
+    'guildRoleUpdate',
+    'guildUnavailable',
+    'guildUpdate',
+    'message',
+    'messageDelete',
+    'messageDeleteBulk',
+    'messageUpdate',
+    'presenceUpdate',
     'ready',
     'reconnecting',
-    'disconnected',
-    'serverCreated',
-    'serverDeleted',
-    'message',
-    'messageDeleted',
-    'messageUpdated',
-    'channelCreated',
-    'channelDeleted',
-    'channelPinsUpdate',
-    'channelUpdated',
-    'serverRoleCreated',
-    'serverRoleDeleted',
-    'serverRoleUpdated',
-    'serverNewMember',
-    'serverMemberRemoved',
-    'serverMemberUpdated',
-    'presence',
-    'userTypingStarted',
-    'userTypingStopped',
-    'userBanned',
-    'userUnbanned',
-    'noteUpdated',
-    'voiceJoin',
-    'voiceSwitch',
-    'voiceLeave',
-    'voiceStateUpdate',
-    'voiceSpeaking'
+    'typingStart',
+    'typingStop',
+    'userUpdate',
+    'voiceStateUpdate'
 ]
 
 var events = {}
@@ -191,9 +189,9 @@ exports['disconnected'] = function (m) {
     console.log(tools.getTimestamp() + ' [Disconnected] ' + m);
 }
 
-exports['serverCreated'] = function (guild) {
+exports['guildCreate'] = function (guild) {
     var bot = main.getBot();
-    for (var i = 0; i < Object.keys(events['serverCreated']).length; i++) events['serverCreated'][i](bot); // call events added by plugins'
+    for (var i = 0; i < Object.keys(events['guildCreate']).length; i++) events['guildCreate'][i](bot); // call events added by plugins'
 
     console.log(guild.name + ' (' + guild.id + ') - ' + guild.channels.length + ' channels');
     if (!fs.existsSync(config.serverDir + guild.id)) fs.mkdirSync(config.serverDir + guild.id); // create server directory
