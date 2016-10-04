@@ -13,6 +13,7 @@ exports['commands'] = [
     'url',
     'version',
     'restart',
+    'exit',
     'pm',
     'say',
     'prefix',
@@ -97,6 +98,14 @@ exports['restart'] = {
                 });
             });
         });
+    }
+}
+
+exports['exit'] = {
+    user: '178482006320087042',
+    description: 'bot will exit',
+    process: function (bot, msg, suffix) {
+        process.exit();
     }
 }
 
