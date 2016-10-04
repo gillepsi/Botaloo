@@ -1,5 +1,8 @@
 'use strict';
 const fs = require('fs');
+const util = require('util');
+const which = require('which');
+const spawn = require('child_process').spawn;
 
 const tools = require('../app/tools.js');
 const events = require('../app/events.js');
@@ -51,7 +54,6 @@ exports['restart'] = {
     process: function (bot, msg, suffix) {
         msg.channel.sendMessage('Fetching updates...').then(function (sentMsg) {
             console.log('Updating...');
-            const spawn = require('child_process').spawn;
             const fetch = spawn('git', ['fetch']);
             fetch.stdout.on('data', function (data) {
                 console.log(data.toString());
@@ -64,7 +66,6 @@ exports['restart'] = {
                 });
                 reset.on('error', function (error) { throw error; });
                 reset.on('close', function (code) {
-                    const which = require('which');
                     const npmKeyword = which.sync('npm');
                     const npm = spawn(npmKeyword, ['install']);
                     npm.on('error', function ( error ) { throw error; });
@@ -73,15 +74,21 @@ exports['restart'] = {
                     });
                     npm.on('close', function (code) {
                         console.log('goodbye');
-                        sentMsg.edit('Restarting :thumbsup:').then(function () {
+                        sentMsg.edit('Restarting...').then(function () {
 
                             bot.destroy().then(function () {
                                 const nodeKeyword = which.sync('node');
                                 const node = spawn(nodeKeyword, ['./']);
+                                console.log = function (d) {
+                                    process.stdout.write(util.format(d) + '\n');
+                                };
+
                                 node.stdout.on('data', function(data) {
+                                    if (data.toString().includes('Ready to begin')) sentMsg.edit('Done :ok_hand:');
                                     console.log(data.toString().replace('\n', '')); 
                                 });
                                 node.on('exit', function (code) {
+                                    console.log('Exiting...');
                                     process.exit();
                                 });
                             });
