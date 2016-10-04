@@ -80,16 +80,17 @@ exports['restart'] = {
                             bot.destroy().then(function () {
                                 const nodeKeyword = which.sync('node');
                                 const node = spawn(nodeKeyword, ['./']);
-                                console.log = function (d) {
-                                    process.stdout.write(util.format(d) + '\n');
-                                };
+                                
+                                sentMsg.edit('Done :ok_hand:');
 
+                                console.log = function (d) {
+                                    process.stdout.write(util.format(d));
+                                };
                                 node.stdout.on('data', function(data) {
-                                    if (data.toString().includes('Ready to begin')) sentMsg.edit('Done :ok_hand:');
-                                    console.log(data.toString().replace('\n', '')); 
+                                    console.log(data.toString()); 
                                 });
                                 node.on('exit', function (code) {
-                                    console.log('Exiting...');
+                                    console.log('Exiting...\n');
                                     process.exit();
                                 });
                             });
@@ -105,6 +106,7 @@ exports['exit'] = {
     user: '178482006320087042',
     description: 'bot will exit',
     process: function (bot, msg, suffix) {
+        msg.channel.sendMessage('Bye :smiley:');
         process.exit();
     }
 }
