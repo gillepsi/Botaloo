@@ -68,7 +68,9 @@ exports['restart'] = {
                 });
                 reset.on('error', function (error) { throw error; });
                 reset.on('close', function (code) {
-                    var npm = spawn('npm', ['install']);
+                    const which = require('which');
+                    const npmKeyword = which.sync('npm');
+                    const npm = spawn(npmKeyword, ['install']);
                     npm.on('error', function ( error ) { throw error; });
                     npm.stdout.on('data', function (data) {
                         console.log(data.toString());
