@@ -24,7 +24,7 @@ exports['bnet'] = {
         var role_list = ['230674791848345600', '230674870076309504', '230674963143589889', '230675011386474497', '230675068013903873'];
 
         if (!user) return msg.channel.sendMessage('Could not find you in this guild :cry:');
-        if (users[msg.guild.id][user.user.id].hasOwnProperty('bnet') && users[msg.guild.id][user.user.id]['bnet'] !== arg) return msg.channel.sendMessage('You have already set your Battle.net :confused:');
+        //if (users[msg.guild.id][user.user.id].hasOwnProperty('bnet') && users[msg.guild.id][user.user.id]['bnet'] !== arg) return msg.channel.sendMessage('You have already set your Battle.net :confused:');
 
         var username = arg;
         var url = 'https://api.lootbox.eu/pc/us/' + username + '/profile';
@@ -46,7 +46,7 @@ exports['bnet'] = {
             for (var i = 0; i < user.roles.array().length; i++) if (role_list.indexOf(user.roles.array()[i].id) === -1) roles.push(user.roles.array()[i].id);
 
             user.setRoles(roles);
-            user.setNickname(arg.replace('-', '#'));
+            // user.setNickname(arg.replace('-', '#'));
             msg.channel.sendMessage('Done :ok_hand:');
         });
     }
