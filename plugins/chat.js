@@ -30,7 +30,7 @@ exports['flags'] = []
 exports['url'] = {
     description: 'get the Bot invite URL',
     process: function (bot, msg, arg) {
-        return msg.channel.sendMessage('https://discordapp.com/oauth2/authorize?client_id='+ auth.client_id + '&scope=bot');
+        return msg.channel.sendMessage('https://discordapp.com/oauth2/authorize?client_id=' + auth.client_id + '&scope=bot');
     }
 }
 
@@ -69,25 +69,23 @@ exports['restart'] = {
                 reset.on('close', function (code) {
                     const npmKeyword = which.sync('npm');
                     const npm = spawn(npmKeyword, ['install']);
-                    npm.on('error', function ( error ) { throw error; });
+                    npm.on('error', function (error) { throw error; });
                     npm.stdout.on('data', function (data) {
                         console.log(data.toString());
                     });
                     npm.on('close', function (code) {
                         console.log('goodbye');
                         sentMsg.edit('Restarting...').then(function () {
-
+                            sentMsg.edit('Done :ok_hand:');
                             bot.destroy().then(function () {
                                 const nodeKeyword = which.sync('node');
                                 const node = spawn(nodeKeyword, ['./']);
-                                
-                                sentMsg.edit('Done :ok_hand:');
 
                                 console.log = function (d) {
                                     process.stdout.write(util.format(d));
                                 };
-                                node.stdout.on('data', function(data) {
-                                    console.log(data.toString()); 
+                                node.stdout.on('data', function (data) {
+                                    console.log(data.toString());
                                 });
                                 node.on('exit', function (code) {
                                     console.log('Exiting...\n');
