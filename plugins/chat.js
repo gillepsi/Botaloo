@@ -49,20 +49,16 @@ exports['restart'] = {
     user: '178482006320087042',
     description: 'bot will perform a git pull and restart',
     process: function (bot, msg, suffix) {
-        msg.channel.sendMessage('fetching updates...').then(function (sentMsg) {
-            console.log('updating...');
-            var spawn = require('child_process').spawn;
-            var log = function (err, stdout, stderr) {
-                if (stdout) { console.log(stdout); }
-                if (stderr) { console.log(stderr); }
-            };
-            var fetch = spawn('git', ['fetch']);
+        msg.channel.sendMessage('Fetching updates...').then(function (sentMsg) {
+            console.log('Updating...');
+            const spawn = require('child_process').spawn;
+            const fetch = spawn('git', ['fetch']);
             fetch.stdout.on('data', function (data) {
                 console.log(data.toString());
             });
             fetch.on('error', function (error) { throw error; })
             fetch.on('close', function (code) {
-                var reset = spawn('git', ['reset', '--hard', 'origin/master']);
+                const reset = spawn('git', ['reset', '--hard', 'origin/master']);
                 reset.stdout.on('data', function (data) {
                     console.log(data.toString());
                 });
@@ -77,9 +73,14 @@ exports['restart'] = {
                     });
                     npm.on('close', function (code) {
                         console.log('goodbye');
-                        sentMsg.edit('brb!').then(function () {
+                        sentMsg.edit('Restarting :thumbsup:').then(function () {
+
                             bot.destroy().then(function () {
-                                process.exit();
+                                const nodeKeyword = which.sync('node');
+                                const node = spawn(nodeKeyword, ['./']);
+                                node.on('exit', function (code) {
+                                    process.exit();
+                                });
                             });
                         });
                     });
