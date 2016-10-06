@@ -103,7 +103,7 @@ exports['exit'] = {
     process: function (bot, msg, suffix) {
         msg.channel.sendMessage('Bye :smiley:');
         console.log('Exiting via command...');
-        process.exit();
+        setTimeout(process.exit, 5000);
     }
 }
 
