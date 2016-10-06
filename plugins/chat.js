@@ -68,10 +68,10 @@ exports['restart'] = {
                 reset.on('error', function (error) { throw error; });
                 reset.on('close', function (code) {
                     const npmKeyword = which.sync('npm');
-                    const npm = spawn(npmKeyword, ['install']);
+                    const npm = spawn(npmKeyword, ['install', '--loglevel=warn']);
                     npm.on('error', function (error) { throw error; });
                     npm.stdout.on('data', function (data) {
-                        console.log(data.toString());
+                        console.log(data.toString().replace('\n', ''));
                     });
                     npm.on('close', function (code) {
                         console.log('Restarting...');
