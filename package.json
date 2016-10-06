@@ -2,9 +2,9 @@
   "name": "botaloo",
   "version": "1.1.0",
   "description": "A discord bot using discord.js",
-  "main": "bot.js",
+  "main": "entry.js",
   "scripts": {
-    "start": "node bot.js",
+    "start": "node entry.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
