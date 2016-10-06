@@ -10,10 +10,19 @@ RUN \
             --yes \
             --no-install-recommends \
             --no-install-suggests \
-        libav-tools \
+        autoconf \
+        automake \
+        build-essential \
+        libass-dev \
+        libgpac-dev \
+        libtheora-dev \
+        libtool \
+        libvorbis-dev \
+        libmp3lame-dev \
+        pkg-config \
         git-core
 
-## yasm - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+# Yasm
 RUN git clone git://github.com/yasm/yasm.git \
     && cd yasm \
     && ./autogen.sh \
@@ -24,7 +33,7 @@ RUN git clone git://github.com/yasm/yasm.git \
     && cd /tmp \
     && rm -rf /tmp/yasm
 
-# libopus - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+# libopus
 RUN git clone git://git.opus-codec.org/opus.git \
     && cd opus \
     && ./autogen.sh \
@@ -35,7 +44,26 @@ RUN git clone git://git.opus-codec.org/opus.git \
     && cd /tmp \
     && rm -rf /tmp/opus
 
-# ffmpeg - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+## libvpx
+RUN git clone https://chromium.googlesource.com/webm/libvpx \
+    && cd libvpx \
+    && ./configure --disable-shared \
+    && make -j`getconf _NPROCESSORS_ONLN` \
+    && make install \
+    && make clean \
+    && cd /tmp \
+    && rm -rf /tmp/libvpx
+
+# AAC
+RUN     wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master \
+	&& tar xzvf fdk-aac.tar.gz \
+	&& cd mstorsjo-fdk-aac* \
+	&& autoreconf -fiv \
+	&& ./configure --disable-shared \
+	&& make \
+	&& make install
+
+# ffmpeg
 RUN git clone git://source.ffmpeg.org/ffmpeg.git \
     && cd ffmpeg \
     && ./configure \
