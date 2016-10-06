@@ -166,6 +166,7 @@ exports['eval'] = {
 exports['exec'] = {
     user: '178482006320087042',
     description: 'execute arbitrary javascript',
+    usage: '<command>',
     process: function (bot, msg, arg) {
         eval(arg);
     }
