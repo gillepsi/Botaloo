@@ -88,7 +88,7 @@ exports['restart'] = {
                                     console.log(data.toString());
                                 });
                                 node.on('exit', function (code) {
-                                    console.log('Exiting...\n');
+                                    console.log('Exiting from child process...\n');
                                     process.exit();
                                 });
                             });
@@ -105,6 +105,7 @@ exports['exit'] = {
     description: 'bot will exit',
     process: function (bot, msg, suffix) {
         msg.channel.sendMessage('Bye :smiley:');
+        console.log('Exiting from command...');
         process.exit();
     }
 }
