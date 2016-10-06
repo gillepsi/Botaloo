@@ -89,10 +89,10 @@ exports['restart'] = {
                                     console.log(data.toString());
                                 });
 
-                                node.on('exit', function (code) {
+                                /*node.on('exit', function (code) {
                                     console.log('Exiting via child process: ' + code + '\n');
-                                    process.exit();
-                                });
+                                    process.exit(100);
+                                });*/
                             });
                         });
                     });
