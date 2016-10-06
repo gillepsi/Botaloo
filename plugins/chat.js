@@ -74,7 +74,7 @@ exports['restart'] = {
                         console.log(data.toString().replace('\n', ''));
                     });
                     npm.on('close', function (code) {
-                        console.log('Exiting...');
+                        console.log('Restarting...');
                         sentMsg.edit('Restarting...').then(function () {
                             sentMsg.edit('Done :ok_hand:');
                             bot.destroy().then(function () {
