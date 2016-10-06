@@ -13,7 +13,18 @@ RUN \
         libav-tools \
         git-core
 
-# FFMPEG - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+## libopus - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+RUN git clone git://git.opus-codec.org/opus.git \
+    && cd opus \
+    && ./autogen.sh \
+    && ./configure --disable-shared \
+    && make -j`getconf _NPROCESSORS_ONLN` \
+    && make install \
+    && make distclean \
+    && cd /tmp \
+    && rm -rf /tmp/opus
+
+# ffmpeg - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
 RUN git clone git://source.ffmpeg.org/ffmpeg.git \
     && cd ffmpeg \
     && ./configure \
