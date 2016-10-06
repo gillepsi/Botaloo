@@ -71,10 +71,10 @@ exports['restart'] = {
                     const npm = spawn(npmKeyword, ['install']);
                     npm.on('error', function (error) { throw error; });
                     npm.stdout.on('data', function (data) {
-                        console.log(data.toString());
+                        console.log(data.toString().replace('\n', ''));
                     });
                     npm.on('close', function (code) {
-                        console.log('goodbye');
+                        console.log('Exiting...');
                         sentMsg.edit('Restarting...').then(function () {
                             sentMsg.edit('Done :ok_hand:');
                             bot.destroy().then(function () {
