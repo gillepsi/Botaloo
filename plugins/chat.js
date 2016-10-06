@@ -86,7 +86,7 @@ exports['restart'] = {
                                 };
 
                                 node.stdout.on('data', function (data) {
-                                    console.log(data.toString() + '\n');
+                                    console.log(data.toString());
                                 });
 
                                 node.on('exit', function (code) {
