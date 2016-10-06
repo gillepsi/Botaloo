@@ -8,11 +8,11 @@ const config = require('../config.json');
 const auth = require('../auth.json');
 
 // create directories if they don't exist
-if (!fs.existsSync('.' + config.logDir)) fs.mkdirSync('.' + config.logdir);
-if (!fs.existsSync('.' + config.serverDir)) fs.mkdirSync('.' + config.serverDir);
+if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logDir);
+if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 
 // setup logging to the log directory
-const log_file = fs.createWriteStream('.' + config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
+const log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
 
 console.log = function (d) {
     log_file.write(util.format(d) + '\r\n');
