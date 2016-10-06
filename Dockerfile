@@ -6,17 +6,12 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN \
     apt-get update \
         --quiet \
-#    && apt-get -qq update \
     && apt-get install \
             --yes \
             --no-install-recommends \
             --no-install-suggests \
-#        -y nodejs npm \
         libav-tools \
         git-core \
-
-# Debian installs 'node' as 'nodejs'
-#    && update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10 \
 
 # Create app directory
     && mkdir -p /usr/src/app
