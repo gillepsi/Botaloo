@@ -36,7 +36,8 @@ exports.eventList = [
     'typingStart',
     'typingStop',
     'userUpdate',
-    'voiceStateUpdate'
+    'voiceStateUpdate',
+    'debug'
 ]
 
 var events = {}
