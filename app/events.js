@@ -176,6 +176,7 @@ exports['ready'] = function () {
         }
     }
     bot.user.setStatus('online', config.game);
+    bot.user.setAvatar(fs.readFileSync('./images/avatar.png'));
 }
 
 exports['reconnecting'] = function (m) {
