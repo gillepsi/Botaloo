@@ -13,7 +13,18 @@ RUN \
         libav-tools \
         git-core
 
-## libopus - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+## yasm - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
+RUN git clone git://github.com/yasm/yasm.git \
+    && cd yasm \
+    && ./autogen.sh \
+    && ./configure \
+    && make -j`getconf _NPROCESSORS_ONLN` \
+    && make install \
+    && make distclean \
+    && cd /tmp \
+    && rm -rf /tmp/yasm
+
+# libopus - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
 RUN git clone git://git.opus-codec.org/opus.git \
     && cd opus \
     && ./autogen.sh \
