@@ -15,7 +15,7 @@ exports['events'] = []
 exports['flags'] = []
 
 exports['bnet'] = {
-    server: '230667021593870336',
+    guild: '230667021593870336',
     description: 'placeholder',
     usage: '<name-id>',
     process: function (bot, msg, arg) {
@@ -49,17 +49,5 @@ exports['bnet'] = {
             // user.setNickname(arg.replace('-', '#'));
             msg.channel.sendMessage('Done :ok_hand:');
         });
-    }
-}
-
-exports['user'] = {
-    description: '',
-    usage: '',
-    process: function (bot, msg, arg) {
-        tools.findUserById(msg, msg.author.id)[0].user.getConnections()
-            .then(function (data) {
-                console.log(data);
-            })
-            .catch(console.log);
     }
 }
