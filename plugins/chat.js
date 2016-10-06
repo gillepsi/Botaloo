@@ -71,7 +71,7 @@ exports['restart'] = {
                     const npm = spawn(npmKeyword, ['install']);
                     npm.on('error', function (error) { throw error; });
                     npm.stdout.on('data', function (data) {
-                        console.log(data.toString().replace('\n', ''));
+                        console.log(data.toString());
                     });
                     npm.on('close', function (code) {
                         console.log('Restarting...');
@@ -84,9 +84,11 @@ exports['restart'] = {
                                 console.log = function (d) {
                                     process.stdout.write(util.format(d));
                                 };
+
                                 node.stdout.on('data', function (data) {
-                                    console.log(data.toString());
+                                    console.log(data.toString() + '\n');
                                 });
+
                                 node.on('exit', function (code) {
                                     console.log('Exiting via child process: ' + code + '\n');
                                     process.exit();
