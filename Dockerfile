@@ -85,7 +85,7 @@ RUN git clone git://source.ffmpeg.org/ffmpeg.git \
     && make install \
     && make distclean \
     && cd /tmp \
-    && rm -rf /tmp/ffmpeg    
+    && rm -rf /tmp/ffmpeg
 
 # Create app directory
 RUN mkdir -p /usr/src/app
