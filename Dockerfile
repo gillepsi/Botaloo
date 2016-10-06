@@ -11,7 +11,7 @@ RUN \
             --no-install-recommends \
             --no-install-suggests \
         libav-tools \
-        git-core \
+        git-core
 
 # FFMPEG - Source https://github.com/cookkkie/mee6/blob/master/voice-bot/Dockerfile
 RUN git clone git://source.ffmpeg.org/ffmpeg.git \
