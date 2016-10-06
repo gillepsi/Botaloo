@@ -61,6 +61,7 @@ exports['play'] = {
         }
 
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        if (!arg) return msg.channel.sendMEssage('Provide a URL or video title :confused:');
 
         var connection = bot.voiceConnections.get(msg.guild.id);
 
