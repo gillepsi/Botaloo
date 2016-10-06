@@ -88,11 +88,6 @@ exports['restart'] = {
                                 node.stdout.on('data', function (data) {
                                     console.log(data.toString());
                                 });
-
-                                /*node.on('exit', function (code) {
-                                    console.log('Exiting via child process: ' + code + '\n');
-                                    process.exit(100);
-                                });*/
                             });
                         });
                     });
