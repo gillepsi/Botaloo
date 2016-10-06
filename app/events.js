@@ -141,8 +141,8 @@ exports['message'] = function (message) {
 
             if (commands[c].role) {
                 if (!message.guild) continue;
-                if (!message.guild.roles.get('id', commands[c].role)) continue
-                if (!message.author.hasRole(message.guild.roles.get('id', commands[c].role))) continue
+                if (!message.guild.roles.find('id', commands[c].role)) continue
+                if (!tools.findUserById(message, message.author.id)[0].roles.exists('id', commands[c].role)) continue
             }
 
             try { // try execute command
