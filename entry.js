@@ -17,6 +17,6 @@ function start() {
         console.log('Process exited: ' + code + '\n');
         delete(this.proc);
         if (code === 2) process.exit(code);
-        if (code === 3) setTimeout(start, 5000);
+        else setTimeout(start, 5000);
     });
 }

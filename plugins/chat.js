@@ -88,7 +88,7 @@ exports['restart'] = {
                                 console.log(data.toString());
                             });
                         });*/
-                        process.exit(3);
+                        process.exit(1);
                         });
                     });
                 });
