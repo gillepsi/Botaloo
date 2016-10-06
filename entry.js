@@ -14,8 +14,9 @@ function start() {
     proc.stderr.on('data', function (data) { console.log(data.toString()); });
 
     proc.on('exit', function (code) {
-        console.log('Restarting main process: ' + code + '\n');
+        console.log('Process exited: ' + code + '\n');
         delete(this.proc);
-        setTimeout(start, 5000);
+        if (code === 2) process.exit(code);
+        if (code === 3) setTimeout(start, 5000);
     });
 }

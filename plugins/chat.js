@@ -88,7 +88,7 @@ exports['restart'] = {
                                 console.log(data.toString());
                             });
                         });*/
-                        process.exit(1);
+                        process.exit(3);
                         });
                     });
                 });
@@ -103,7 +103,7 @@ exports['exit'] = {
     process: function (bot, msg, suffix) {
         msg.channel.sendMessage('Bye :smiley:');
         console.log('Exiting via command...');
-        setTimeout(process.exit, 5000);
+        setTimeout(process.exit(2), 5000);
     }
 }
 
