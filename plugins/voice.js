@@ -25,7 +25,7 @@ exports['join'] = {
     description: 'joins your voice channel',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
-        
+
         var voiceChannel = tools.getAuthorVoiceChannel(msg);
         if (voiceChannel) voiceChannel.join();
         else return msg.channel.sendMessage('You are not in a voice channel :confused:');
@@ -76,15 +76,22 @@ exports['play'] = {
                         console.log(error);
                     });
             } else {
-                stream = request.get(arg);
+                stream = request(arg, function (error, response) {
+                    if (error) {
+                        msg.channel.sendMessage('An error occured :cry:');
+                        console.log(error);
+                        return;
+                    }
+                });
             }
-            playStream(bot, msg, stream, arg);
+            if (stream) playStream(bot, msg, stream, arg);
         } else {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
             request(searchURL, function (error, response) {
                 if (error) {
                     msg.channel.sendMessage('An error occured :cry:');
                     console.log(error);
+                    return;
                 }
                 var payload = JSON.parse(response.body);
                 if (payload['items'].length == 0) return msg.channel.sendMessage('Didn\'t find anything :cry:');
@@ -123,7 +130,7 @@ exports['pause'] = {
     description: 'pause playing audio',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
-        
+
         var connection = bot.voiceConnections.get(msg.guild.id);
         if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
         if (connection.player.dispatcher) connection.player.dispatcher.pause();
@@ -135,7 +142,7 @@ exports['resume'] = {
     description: 'resume playing audio',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
-        
+
         var connection = bot.voiceConnections.get(msg.guild.id);
         if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
         if (connection.player.dispatcher) connection.player.dispatcher.resume();
@@ -147,7 +154,7 @@ exports['stop'] = {
     description: 'stop playing audio',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
-        
+
         var connection = bot.voiceConnections.get(msg.guild.id);
         if (!connection) return msg.channel.sendMessage('Not in a voice channel :confused:');
         if (connection.player.dispatcher) connection.player.dispatcher.end();
