@@ -146,22 +146,21 @@ exports['message'] = function (message) {
         var stop = false; // TODO: move to flag responses object
         for (var flag in flags) { // check flags
             var flag_pos = cmd.indexOf('-' + flag);
-            var flag_whitespace_pos = flag_pos + 3;
-            var flag_arg = '';
-
-            if (flags[flag].usage) {
-                var complete = false;
-                while (!complete) {
-                    if (flag_whitespace_pos === cmd.length || cmd[flag_whitespace_pos] === ' ') complete = true;
-                    else flag_whitespace_pos += 1;
-                }
-                
-                flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos);
-            }
 
             if (flag_pos != -1) {
-                if (flags[flag].usage) cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos, cmd.length);
-                else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length);
+                var flag_whitespace_pos = flag_pos + 3;
+                var flag_arg = '';
+
+                if (flags[flag].usage) {
+                    var complete = false;
+                    while (!complete) {
+                        if (flag_whitespace_pos === cmd.length || cmd[flag_whitespace_pos] === ' ') complete = true;
+                        else flag_whitespace_pos += 1;
+                    }
+                    
+                    flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos);
+                    cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos, cmd.length)
+                } else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length);
 
                 if (flags[flag].guild && message.guild.id !== flags[flag].guild) continue
                 if (flags[flag].user && message.author.id !== flags[flag].user) continue
@@ -171,6 +170,7 @@ exports['message'] = function (message) {
                     if (!message.guild.roles.find('id', flags[flag].role)) continue
                     if (!tools.findUserById(message, message.author.id)[0].roles.exists('id', flags[flag].role)) continue
                 }
+                
                 var response = flags[flag].process(main.getBot(), message, flag_arg);
                 if (response === 'stop') stop = true; // 'stop' response
             }
