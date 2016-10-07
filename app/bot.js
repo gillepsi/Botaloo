@@ -11,7 +11,7 @@ const auth = require('../auth.json');
 if (!fs.existsSync(config.logDir)) fs.mkdirSync(config.logDir);
 if (!fs.existsSync(config.serverDir)) fs.mkdirSync(config.serverDir);
 
-// setup logging to the log directory
+// create log file
 const log_file = fs.createWriteStream(config.logDir + tools.getTimestamp().replace(/:/g, '') + '.log', { flags: 'w' });
 
 console.log = function (d) {
@@ -23,7 +23,7 @@ try {
     const events = require('./events.js');
 
     const bot = new Discord.Client({ forceFetchUsers: true });
-    exports['getBot'] = function () { return bot; }
+    exports['getBot'] = function () { return bot; } // used by events to get the bot
 
     // load plugins
     fs.readdirSync(config.pluginDir).forEach(function (file) {
@@ -33,7 +33,7 @@ try {
         if (plugin.flags) for (var i = 0; i < plugin.flags.length; i++) events.addFlag(plugin.flags[i], plugin[plugin.flags[i]]);
     });
 
-    // event handlers
+    // add event handlers
     for (var event in events.eventList) if (events[events.eventList[event]]) bot.on(events.eventList[event], events[events.eventList[event]]);
 
     bot.login(auth.discord_token);
