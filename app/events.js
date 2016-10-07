@@ -58,7 +58,10 @@ var flags = {
             if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
             var user = tools.findUserByName(msg, arg)[0];
 
-            if (!user) return msg.channel.sendMessage('User not found :cry:');
+            if (!user) {
+                msg.channel.sendMessage('User not found :cry:')
+                return 'stop';
+            }
             msg.author = user.user;
         }
     }
@@ -121,7 +124,7 @@ exports['message'] = function (message) {
 
     for (var i = 0; i < Object.keys(events['message']).length; i++) { // call events added by plugins
         var response = events['message'][i](bot, message); // get response from plugin event
-        if (response === 'stop') stop = true; // stop response
+        if (response === 'stop') stop = true; // 'stop'' response
         if (response === 'prefix') newPrefix = users[message.guild.id][message.author.id]['prefix']; // add a prefix
     }
 
@@ -140,6 +143,7 @@ exports['message'] = function (message) {
 
         if (cmd === '') return message.channel.sendMessage('That\'s me!'); // default response
 
+        var stop = false; // TODO: move to flag responses object
         for (var flag in flags) { // check flags
             var flag_pos = cmd.indexOf('-' + flag);
             var flag_whitespace_pos = flag_pos + 3;
@@ -167,9 +171,12 @@ exports['message'] = function (message) {
                     if (!message.guild.roles.find('id', flags[flag].role)) continue
                     if (!tools.findUserById(message, message.author.id)[0].roles.exists('id', flags[flag].role)) continue
                 }
-                flags[flag].process(main.getBot(), message, flag_arg);
+                var response = flags[flag].process(main.getBot(), message, flag_arg);
+                if (response === 'stop') stop = true; // 'stop' response
             }
         }
+
+        if (stop) return; // 'stop' response stops further execution of this event
 
         for (var c in commands) { // check commands
             var whitespace = cmd.indexOf(' ');
