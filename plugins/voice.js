@@ -61,7 +61,7 @@ exports['play'] = {
         }
 
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
-        if (!arg) return msg.channel.sendMEssage('Provide a URL or video title :confused:');
+        if (!arg) return msg.channel.sendMessage('Provide a URL or video title :confused:');
 
         var connection = bot.voiceConnections.get(msg.guild.id);
 
@@ -70,7 +70,11 @@ exports['play'] = {
         if (arg.substring(0, 7).toLowerCase() === 'http://' || arg.substring(0, 8).toLowerCase() === 'https://') {
             var stream;
             if (arg.includes('youtube.com') || arg.includes('youtu.be')) {
-                stream = ytdl(arg, { filter: 'audioonly', quality: 'highest' });
+                stream = ytdl(arg, { filter: 'audioonly', quality: 'highest' })
+                    .on('error', function (error) {
+                        msg.channel.sendMessage('An error occured :cry:');
+                        console.log(error);
+                    });
             } else {
                 stream = request.get(arg);
             }
@@ -78,6 +82,10 @@ exports['play'] = {
         } else {
             var searchURL = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + encodeURI(arg) + '&key=' + ytAPIKey;
             request(searchURL, function (error, response) {
+                if (error) {
+                    msg.channel.sendMessage('An error occured :cry:');
+                    console.log(error);
+                }
                 var payload = JSON.parse(response.body);
                 if (payload['items'].length == 0) return msg.channel.sendMessage('Didn\'t find anything :cry:');
 
