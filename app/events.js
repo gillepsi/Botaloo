@@ -156,7 +156,7 @@ exports['message'] = function (message) {
             }
 
             if (flag_pos != -1) {
-                if (flags[flag].usage) cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos + 1, cmd.length);
+                if (flags[flag].usage) cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos, cmd.length);
                 else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length);
 
                 if (flags[flag].guild && message.guild.id !== flags[flag].guild) continue
