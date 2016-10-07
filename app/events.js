@@ -49,6 +49,19 @@ var flags = {
         process: function (bot, msg, arg) {
             msg.delete();
         }
+    },
+
+    'u': {
+        bool: false,
+        usage: '<username>',
+        description: 'executes command for another user',
+        process: function (bot, msg, arg) {
+            if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+            var user = tools.findUserByName(msg, arg)[0];
+
+            if (!user) return msg.channel.sendMessage('User not found :cry:');
+            msg.author = user.user;
+        }
     }
 };
 
@@ -68,11 +81,13 @@ var commands = {
             response += '```\n Flags:```';
             for (var flag in flags) {
                 var desc = flags[flag].description;
+                var usage = flags[flag].usage + ' ';
 
-                response += '\n-' + flag + ' - ' + desc;
+                if (usage === 'undefined ') usage = '';
+                response += '\n-' + flag + ' ' + usage + '- ' + desc;
             }
             response += '```';
-            msg.author.sendMessage( response);
+            msg.author.sendMessage(response);
         }
     }
 };
@@ -127,10 +142,25 @@ exports['message'] = function (message) {
         if (cmd === '') return message.channel.sendMessage('That\'s me!'); // default response
 
         for (var flag in flags) { // check flags
-            var flagpos = cmd.indexOf('-' + flag);
-            if (flagpos != -1) {
-                flags[flag].bool = true;
-                cmd = cmd.substring(0, flagpos - 1) + cmd.substring(flagpos + 2, cmd.length);
+            var flag_pos = cmd.indexOf('-' + flag);
+            var flag_whitespace_pos = flag_pos + 3;
+            var flag_arg = '';
+
+            if (flags[flag].usage) {
+                var complete = false;
+                while (!complete) {
+                    if (flag_whitespace_pos === cmd.length || cmd[flag_whitespace_pos] === ' ') complete = true;
+                    else flag_whitespace_pos += 1;
+                }
+                
+                flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos);
+            }
+
+            if (flag_pos != -1) {
+                //flags[flag].bool = true;
+                flags[flag].process(main.getBot(), message, flag_arg);
+                if (flags[flag].usage) cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos + 1, cmd.length);
+                else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length);
             }
         }
 
@@ -154,7 +184,7 @@ exports['message'] = function (message) {
             }
         }
 
-        for (flag in flags) if (flags[flag].bool) flags[flag].process(main.getBot(), message, cmd); // check flags
+        //for (flag in flags) if (flags[flag].bool) ; // check flags
     }
 }
 
