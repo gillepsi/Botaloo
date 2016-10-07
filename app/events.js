@@ -147,21 +147,25 @@ exports['message'] = function (message) {
         for (var flag in flags) { // check flags
             var flag_pos = cmd.indexOf('-' + flag);
 
-            if (flag_pos != -1) {
+            if (flag_pos != -1) { // if flag is in command
                 var flag_whitespace_pos = flag_pos + 3;
                 var flag_arg = '';
 
-                if (flags[flag].usage) {
+                if (flags[flag].usage) { // if flag has arguments
                     var complete = false;
                     while (!complete) {
+                        // iterate through characters until whitespace or end of command
+                        // prefix say test -u User -d
+                        //    flag_pos --> ^^^^^^^^ <-- flag_whitespace_pos
                         if (flag_whitespace_pos === cmd.length || cmd[flag_whitespace_pos] === ' ') complete = true;
                         else flag_whitespace_pos += 1;
                     }
                     
-                    flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos);
-                    cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos, cmd.length)
-                } else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length);
+                    flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos); 
+                    cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos, cmd.length); // remove flag and argument from command
+                } else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length); // remove flag from command
 
+                // check if flag has particular requirements
                 if (flags[flag].guild && message.guild.id !== flags[flag].guild) continue
                 if (flags[flag].user && message.author.id !== flags[flag].user) continue
 
@@ -170,8 +174,8 @@ exports['message'] = function (message) {
                     if (!message.guild.roles.find('id', flags[flag].role)) continue
                     if (!tools.findUserById(message, message.author.id)[0].roles.exists('id', flags[flag].role)) continue
                 }
-                
-                var response = flags[flag].process(main.getBot(), message, flag_arg);
+
+                var response = flags[flag].process(main.getBot(), message, flag_arg); // get response from flag function
                 if (response === 'stop') stop = true; // 'stop' response
             }
         }
@@ -181,6 +185,8 @@ exports['message'] = function (message) {
         for (var c in commands) { // check commands
             var whitespace = cmd.indexOf(' ');
             if (whitespace === -1) whitespace = cmd.length;
+
+            // check if command has particular requirements
             if (commands[c].guild && message.guild.id !== commands[c].guild) continue
             if (commands[c].user && message.author.id !== commands[c].user) continue
 
