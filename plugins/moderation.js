@@ -108,7 +108,6 @@ exports['message'] = function (bot, message) {
 }
 
 exports['m'] = {
-    bool: false,
     description: 'bot will not send a response',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');

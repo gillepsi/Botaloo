@@ -44,7 +44,6 @@ var events = {}
 
 var flags = {
     'd': {
-        bool: false,
         description: 'deletes your command message',
         process: function (bot, msg, arg) {
             msg.delete();
@@ -52,7 +51,7 @@ var flags = {
     },
 
     'u': {
-        bool: false,
+        role: '191447208959279106',
         usage: '<username>',
         description: 'executes command for another user',
         process: function (bot, msg, arg) {
@@ -157,10 +156,18 @@ exports['message'] = function (message) {
             }
 
             if (flag_pos != -1) {
-                //flags[flag].bool = true;
-                flags[flag].process(main.getBot(), message, flag_arg);
                 if (flags[flag].usage) cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos + 1, cmd.length);
                 else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length);
+
+                if (flags[flag].guild && message.guild.id !== flags[flag].guild) continue
+                if (flags[flag].user && message.author.id !== flags[flag].user) continue
+
+                if (flags[flag].role) {
+                    if (!message.guild) continue;
+                    if (!message.guild.roles.find('id', flags[flag].role)) continue
+                    if (!tools.findUserById(message, message.author.id)[0].roles.exists('id', flags[flag].role)) continue
+                }
+                flags[flag].process(main.getBot(), message, flag_arg);
             }
         }
 
