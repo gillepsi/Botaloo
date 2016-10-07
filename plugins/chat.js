@@ -76,19 +76,7 @@ exports['restart'] = {
                     npm.on('close', function (code) {
                         console.log('Restarting...');
                         sentMsg.edit('Done :ok_hand:').then(function () {
-                        /*bot.destroy().then(function () {
-                            const nodeKeyword = which.sync('node');
-                            const node = spawn(nodeKeyword, ['./']);
-
-                            console.log = function (d) {
-                                process.stdout.write(util.format(d));
-                            };
-
-                            node.stdout.on('data', function (data) {
-                                console.log(data.toString());
-                            });
-                        });*/
-                        process.exit(1);
+                            bot.destroy().then(function () { process.exit(1); });
                         });
                     });
                 });
