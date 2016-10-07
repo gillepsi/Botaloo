@@ -190,8 +190,6 @@ exports['message'] = function (message) {
                 console.log(e.stack.replace(/\s\s\s\s/g, '\r\n    '));
             }
         }
-
-        //for (flag in flags) if (flags[flag].bool) ; // check flags
     }
 }
 
