@@ -5,7 +5,7 @@ const main = require('./bot.js');
 const tools = require('./tools.js');
 const config = require('../config.json');
 
-exports.eventList = [
+exports.eventList = [ // a list of all events used by discord.js
     'channelCreate',
     'channelDelete',
     'channelPinsUpdate',
@@ -68,7 +68,7 @@ var flags = {
 };
 
 var commands = {
-    'help': {
+    'help': { // help is a default command included with the bot
         description: 'lists all commands',
         process: function (bot, msg, arg) {
             var response = 'Commands:```';
@@ -124,19 +124,20 @@ exports['message'] = function (message) {
 
     for (var i = 0; i < Object.keys(events['message']).length; i++) { // call events added by plugins
         var response = events['message'][i](bot, message); // get response from plugin event
-        if (response === 'stop') stop = true; // 'stop'' response
-        if (response === 'prefix') newPrefix = users[message.guild.id][message.author.id]['prefix']; // add a prefix
+        if (response === 'stop') stop = true; // 'stop' response
+        if (response === 'prefix') newPrefix = users[message.guild.id][message.author.id]['prefix']; // 'prefix' response
     }
 
     if (stop) return; // 'stop' response stops further execution of this event
 
-    var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase(); // get prefix from message and escape uppercase chars and whitespace
-    var msgNewPrefix = (newPrefix !== '' ? message.content.substring(0, newPrefix.length) : ' ') // get new prefix from message
-    if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase() || msgNewPrefix === newPrefix) { // if prefix is in message
-        for (flag in flags) flags[flag].bool = false; // set all flags to false
+    // get prefix from message and escape uppercase chars and whitespace
+    var msgPrefix = message.content.substring(0, config.prefix.length).replace(/\s/g, '').toLowerCase();
+    // get new prefix from message
+    var msgNewPrefix = (newPrefix !== '' ? message.content.substring(0, newPrefix.length) : ' ');
 
+    if (msgPrefix === config.prefix.replace(/\s/g, '').toLowerCase() || msgNewPrefix === newPrefix) { // if prefix is in message
         var cmd_start = (msgNewPrefix === newPrefix ? newPrefix.length : config.prefix.length);
-        while (message.content[cmd_start] === ' ') cmd_start += 1;
+        while (message.content[cmd_start] === ' ') cmd_start += 1; // escape all whitespace succeeding the prefix
 
         var cmd = message.content.substring(cmd_start); // get cmd from message
         console.log(tools.getTimestamp() + ' ' + cmd + ' from @' + message.author.username);
@@ -153,15 +154,12 @@ exports['message'] = function (message) {
 
                 if (flags[flag].usage) { // if flag has arguments
                     var complete = false;
-                    while (!complete) {
-                        // iterate through characters until whitespace or end of command
-                        // prefix say test -u User -d
-                        //    flag_pos --> ^^^^^^^^ <-- flag_whitespace_pos
+                    while (!complete) { // iterate through characters until whitespace or end of command
                         if (flag_whitespace_pos === cmd.length || cmd[flag_whitespace_pos] === ' ') complete = true;
                         else flag_whitespace_pos += 1;
                     }
                     
-                    flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos); 
+                    flag_arg = cmd.substring(flag_pos + 3, flag_whitespace_pos); // flag argument is inbetween end of flag and whitespace
                     cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_whitespace_pos, cmd.length); // remove flag and argument from command
                 } else cmd = cmd.substring(0, flag_pos - 1) + cmd.substring(flag_pos + 2, cmd.length); // remove flag from command
 
