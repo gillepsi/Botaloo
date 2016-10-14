@@ -7,7 +7,8 @@ const events = require('../app/events.js');
 const config = require('../config.json');
 
 exports['commands'] = [
-    'bnet'
+    'bnet',
+    'bnet sort'
 ]
 
 exports['events'] = []
@@ -15,8 +16,28 @@ exports['events'] = []
 exports['flags'] = []
 
 exports['bnet'] = {
+    description: 'return the users overwatch rating',
+    usage: '<name-id>',
+    process: function (bot, msg, arg) {
+        var user = msg.guild.members.find('id', msg.author.id);
+        
+        if (!user) return msg.channel.sendMessage('Could not find you in this guild :cry:');
+
+        var username = arg;
+        var url = 'https://api.lootbox.eu/pc/us/' + username + '/profile';
+        request(url, function (error, response) {
+            var result = JSON.parse(response.body);
+            if (result.error) return msg.channel.sendMessage(result.error);
+
+            var rank = parseInt(result.data.competitive.rank);
+            msg.channel.sendMessage('**' + username + '**: ' + rank;)
+        });
+    }
+}
+
+exports['bnet sort'] = {
     guild: '230667021593870336',
-    description: 'placeholder',
+    description: 'sort a user into ranks based on overwatch rating',
     usage: '<name-id>',
     process: function (bot, msg, arg) {
         var user = msg.guild.members.find('id', msg.author.id);
