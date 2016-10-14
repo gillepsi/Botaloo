@@ -30,7 +30,7 @@ exports['bnet'] = {
             if (result.error) return msg.channel.sendMessage(result.error);
 
             var rank = parseInt(result.data.competitive.rank);
-            msg.channel.sendMessage('**' + username + '**: ' + rank;)
+            msg.channel.sendMessage('**' + username + '**: ' + rank);
         });
     }
 }
