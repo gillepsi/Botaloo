@@ -20,6 +20,7 @@ exports['flags'] = [
 ]
 
 exports['mute'] = {
+    role: '191447208959279106',
     description: 'mute a user',
     usage: '<username>',
     process: function (bot, msg, arg) {
@@ -42,6 +43,7 @@ exports['mute'] = {
 }
 
 exports['disable'] = {
+    role: '191447208959279106',
     usage: '<username>',
     description: 'disable a user from using this bot',
     process: function (bot, msg, arg) {
@@ -64,45 +66,28 @@ exports['disable'] = {
 }
 
 exports['clear'] = {
+    role: '191447208959279106',
     description: 'clear messages from current channel',
     usage: '[name] <number>',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
+        if (arg === '') return msg.channel.sendMessage('Provide a number of messages to clear :confused:');
 
         var args = arg.split(' ');
+        var number = arg;
+        if (args.length > 1) number = args[1]; 
 
-        if (args.length > 1) {
-            if (args[1] === '') args[1] = '2';
-            msg.channel.fetchMessages({ limit: parseInt(args[1]) })
-                .then(function (messages) {
-                    var messagesToDelete = messages.filter(function(message) {
-                        return message.author.username === arg[0];
+        msg.channel.fetchMessages({ limit: number, before: msg })
+            .then(function (messages) {
+                var messagesToDelete = (args.length > 1 ? messages.filter(function(message) { return message.author.username === args[0] }) : messages);
+                msg.channel.bulkDelete(messagesToDelete)
+                    .catch(function (error) {
+                        msg.channel.sendMessage('Error deleting message :cry:');
+                    })
+                    .then(function (messagesDeleted) {
+                        msg.channel.sendMessage('Deleted **' + (messagesDeleted.size) + '** messages :ok_hand:');
                     });
-                    console.log(messagesToDelete);
-                    msg.channel.bulkDelete(messagesToDelete)
-                        .catch(function (error) {
-                            msg.channel.sendMessage('Error: ' + error);
-                        })
-                        .then(function (messagesDeleted) {
-                            msg.channel.sendMessage('Deleted **' + (messagesDeleted.size) + '** messages :ok_hand:');
-                        });
-                });
-        } else {
-            if (arg === '') arg = '2';
-            msg.channel.fetchMessages({ limit: arg })
-                .then(function (messages) {
-                    msg.channel.bulkDelete(messages)
-                        .catch(function (e) {
-                            msg.channel.sendMessage('Error deleting message :cry:');
-                        })
-                        .then (function (messagesDeleted) {
-                            msg.channel.sendMessage('Deleted **' + (messagesDeleted.size) + '** messages :ok_hand:');
-                        });
-                })
-                .catch(function (error) {
-                    msg.channel.sendMessage('Error getting logs :cry:');
-                });
-        }
+            });
     }
 }
 
