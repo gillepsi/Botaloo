@@ -65,25 +65,40 @@ exports['disable'] = {
 
 exports['clear'] = {
     description: 'clear messages from current channel',
-    usage: '<number>',
+    usage: '[name] <number>',
     process: function (bot, msg, arg) {
         if (!msg.guild) return msg.channel.sendMessage('Nope! :poop:');
-        if (arg > 100) return msg.channel.sendMessage('Nope! :poop:');
-        if (arg === '') arg = '2';
-        msg.channel.fetchMessages({ limit: arg })
-            .then(function (messages) {
-                for (var i = 0; i < messages.size; i++) {
-                    var message = messages.array()[i];
-                    message.delete()
+
+        var args = arg.split(' ');
+
+        if (args.length > 1) {
+            if (args[1] === '') args[1] = '2';
+            msg.channel.fetchMessages({ limit: parseInt(args[1]) })
+                .then(function (messages) {
+                    var messagesToDelete = messages.filter(function(message) {
+                        return message.author.username === arg[0];
+                    });
+                    msg.channel.bulkDelete(messagesToDelete)
+                        .then(function (messagesDeleted) {
+                            msg.channel.sendMessage('Deleted **' + (messagesDeleted.size) + '** messages :ok_hand:');
+                        });
+                });
+        } else {
+            if (arg === '') arg = '2';
+            msg.channel.fetchMessages({ limit: arg })
+                .then(function (messages) {
+                    msg.channel.bulkDelete(messages)
                         .catch(function (e) {
                             msg.channel.sendMessage('Error deleting message :cry:');
+                        })
+                        .then (function (messagesDeleted) {
+                            msg.channel.sendMessage('Deleted **' + (messagesDeleted.size) + '** messages :ok_hand:');
                         });
-                }
-                msg.channel.sendMessage('Deleted **' + (messages.size - 1) + '** messages :ok_hand:');
-            })
-            .catch(function (error) {
-                msg.channel.sendMessage('Error getting logs :cry:');
-            });
+                })
+                .catch(function (error) {
+                    msg.channel.sendMessage('Error getting logs :cry:');
+                });
+        }
     }
 }
 
