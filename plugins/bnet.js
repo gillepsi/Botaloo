@@ -25,12 +25,11 @@ exports['bnet'] = {
 
         var username = arg;
         var url = 'https://api.lootbox.eu/pc/us/' + username + '/profile';
-        msg.channel.sendMessage(url);
         request(url, function (error, response) {
             var result = JSON.parse(response.body);
-            msg.channel.sendMessage('a');
-            if (error) return msg.channel.sendMessage('b');
-            if (result.error) return msg.channel.sendMessage('c');
+            
+            if (error) return msg.channel.sendMessage(error);
+            if (result.error) return msg.channel.sendMessage(result.error);
 
             var rank = parseInt(result.data.competitive.rank);
             msg.channel.sendMessage('**' + username + '**: ' + rank + ' SR');
