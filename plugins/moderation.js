@@ -77,7 +77,7 @@ exports['clear'] = {
         var number = arg;
         if (args.length > 1) number = args[1]; 
 
-        msg.channel.fetchMessages({ limit: number, before: msg })
+        msg.channel.fetchMessages({ limit: number, before: msg.id })
             .then(function (messages) {
                 var messagesToDelete = (args.length > 1 ? messages.filter(function(message) { return message.author.username === args[0] }) : messages);
                 msg.channel.bulkDelete(messagesToDelete)
