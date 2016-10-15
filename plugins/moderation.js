@@ -78,7 +78,11 @@ exports['clear'] = {
                     var messagesToDelete = messages.filter(function(message) {
                         return message.author.username === arg[0];
                     });
+                    console.log(messagesToDelete);
                     msg.channel.bulkDelete(messagesToDelete)
+                        .catch(function (error) {
+                            msg.channel.sendMessage('Error: ' + error);
+                        })
                         .then(function (messagesDeleted) {
                             msg.channel.sendMessage('Deleted **' + (messagesDeleted.size) + '** messages :ok_hand:');
                         });
