@@ -28,8 +28,9 @@ exports['bnet'] = {
         msg.channel.sendMessage('gotcommand');
         request(url, function (error, response) {
             var result = JSON.parse(response.body);
-            if (error) return msg.channel.sendMessage(error);
-            if (result.error) return msg.channel.sendMessage(result.error);
+            msg.channel.sendMessage('a');
+            if (error) return msg.channel.sendMessage('b');
+            if (result.error) return msg.channel.sendMessage('c');
 
             var rank = parseInt(result.data.competitive.rank);
             msg.channel.sendMessage('**' + username + '**: ' + rank + ' SR');
