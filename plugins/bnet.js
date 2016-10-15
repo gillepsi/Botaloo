@@ -25,7 +25,7 @@ exports['bnet'] = {
 
         var username = arg;
         var url = 'https://api.lootbox.eu/pc/us/' + username + '/profile';
-        msg.channel.sendMessage('gotcommand');
+        msg.channel.sendMessage(url);
         request(url, function (error, response) {
             var result = JSON.parse(response.body);
             msg.channel.sendMessage('a');
