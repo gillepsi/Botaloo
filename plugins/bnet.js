@@ -27,6 +27,7 @@ exports['bnet'] = {
         var url = 'https://api.lootbox.eu/pc/us/' + username + '/profile';
         request(url, function (error, response) {
             var result = JSON.parse(response.body);
+            if (error) return msg.channel.sendMessage(error);
             if (result.error) return msg.channel.sendMessage(result.error);
 
             var rank = parseInt(result.data.competitive.rank);
